@@ -11,17 +11,19 @@
 
         <h1>Create Account</h1>
 
-        <form>
-            <input type="text" placeholder="Enter your name" required>
+        <form method="POST" action="/register">
+
+            <input type="text" name="name" placeholder="Enter your name" required>
             <br><br>
 
-            <input type="email" placeholder="Enter your email" required>
+            <input type="email" name="email" placeholder="Enter your email" required>
             <br><br>
 
-            <input type="password" placeholder="Create password" required>
+            <input type="password" name="password" placeholder="Create password" required>
             <br><br>
 
             <button type="submit">Register</button>
+
         </form>
 
         <p>
