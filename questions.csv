@@ -1,0 +1,7 @@
+subject,topic,difficulty,question,option_a,option_b,option_c,option_d,correct_answer,explanation
+Java,Arrays,Easy,Which data structure stores elements in contiguous memory locations?,Array,Linked List,Stack,Queue,A,An array stores elements in contiguous memory locations.
+Java,Arrays,Easy,Which data structure stores elements in contiguous memory locations?,Array,Linked List,Stack,Queue,A,An array stores elements in contiguous memory locations and allows index-based access.
+Java,OOP,Easy,Which keyword is used to inherit a class in Java?,this,super,extends,implements,C,The extends keyword is used when one class inherits another class in Java.
+Python,Strings,Easy,Which symbol is used to start a comment in Python?,//,#,/*,<!--,B,The hash symbol is used to write comments in Python.
+SQL,Basics,Easy,Which SQL command is used to retrieve data from a table?,SELECT,INSERT,UPDATE,DELETE,A,The SELECT statement is used to retrieve data from one or more tables.
+C,Arrays,Easy,Which index does the first element of an array have in C?,0,1,-1,Depends on array,A,C arrays use zero-based indexing, so the first element is at index 0.

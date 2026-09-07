@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Practice - Placement Preparation Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    {% if not questions %}
+
+        <h1>Placement Practice</h1>
+
+        <p>Choose a subject and number of questions.</p>
+
+        <form method="GET" action="/practice">
+
+            <label>Choose Subject:</label>
+            <br><br>
+
+            <select name="subject" required>
+                <option value="">Select Subject</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+                <option value="SQL">SQL</option>
+                <option value="C">C</option>
+            </select>
+
+            <br><br>
+
+            <label>Number of Questions:</label>
+            <br><br>
+
+            <select name="count" required>
+                <option value="5">5 Questions</option>
+                <option value="10">10 Questions</option>
+                <option value="20">20 Questions</option>
+            </select>
+
+            <br><br>
+
+            <button type="submit">Start Practice</button>
+
+        </form>
+
+    {% else %}
+
+        <h1>{{ subject }} Practice</h1>
+
+        <form method="POST" action="/submit-practice">
+
+            {% for q in questions %}
+
+                <!-- Send the current question ID -->
+                <input type="hidden"
+                       name="question_ids"
+                       value="{{ q['id'] }}">
+
+                <div class="question-box">
+
+                    <h3>
+                        {{ loop.index }}. {{ q["question"] }}
+                    </h3>
+
+                    <label>
+                        <input type="radio"
+                               name="question_{{ q['id'] }}"
+                               value="A"
+                               required>
+                        A. {{ q["option_a"] }}
+                    </label>
+
+                    <br>
+
+                    <label>
+                        <input type="radio"
+                               name="question_{{ q['id'] }}"
+                               value="B">
+                        B. {{ q["option_b"] }}
+                    </label>
+
+                    <br>
+
+                    <label>
+                        <input type="radio"
+                               name="question_{{ q['id'] }}"
+                               value="C">
+                        C. {{ q["option_c"] }}
+                    </label>
+
+                    <br>
+
+                    <label>
+                        <input type="radio"
+                               name="question_{{ q['id'] }}"
+                               value="D">
+                        D. {{ q["option_d"] }}
+                    </label>
+
+                </div>
+
+                <hr>
+
+            {% endfor %}
+
+            <input type="hidden"
+                   name="subject"
+                   value="{{ subject }}">
+
+            <button type="submit">
+                Submit Practice
+            </button>
+
+        </form>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
