@@ -2,52 +2,168 @@
 <html>
 <head>
     <title>Dashboard - Placement Preparation Analyzer</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>Student Dashboard</h1>
+    <h1>Welcome, {{ user_name or "Student" }} 👋</h1>
 
-        <p>Welcome to your Placement Preparation Dashboard!</p>
+    <p>
+        Track your placement preparation and improve your performance.
+    </p>
 
-        <div class="dashboard-cards">
 
-            <div class="card">
-                <h2>Preparation Progress</h2>
-                <p>0%</p>
-            </div>
+    <!-- MAIN ACTIONS -->
 
-            <div class="card">
-                <h2>Questions Attempted</h2>
-                <p>0</p>
-            </div>
+    <div class="dashboard-cards">
 
-            <div class="card">
-                <h2>Average Score</h2>
-                <p>0%</p>
-            </div>
+        <div class="card">
+            <h2>Practice</h2>
+            <p>
+                Practice placement questions by category,
+                subject and difficulty.
+            </p>
 
-            <div class="card">
-                <h2>Weak Topics</h2>
-                <p>Not analyzed yet</p>
-            </div>
-
+            <a href="/practice">
+                <button type="button">
+                    Start Practice
+                </button>
+            </a>
         </div>
 
-        <br>
 
-        <a href="/practice">
-            <button type="button">Start Practice</button>
-        </a>
+        <div class="card">
+            <h2>Performance</h2>
+            <p>
+                Check your scores, weak topics and
+                personalized recommendations.
+            </p>
 
-        <a href="/performance">
-            <button type="button">View Performance</button>
-        </a>
+            <a href="/performance">
+                <button type="button">
+                    View Performance
+                </button>
+            </a>
+        </div>
+
+
+        <div class="card">
+            <h2>Question Bank</h2>
+            <p>
+                Questions are continuously added to
+                the placement question bank.
+            </p>
+
+            <a href="/admin">
+                <button type="button">
+                    Manage Questions
+                </button>
+            </a>
+        </div>
 
     </div>
+
+
+    <hr>
+
+
+    <!-- PREPARATION AREAS -->
+
+    <h2>Placement Preparation Areas</h2>
+
+    <div class="dashboard-cards">
+
+        <div class="card">
+            <h3>🧮 Aptitude</h3>
+            <p>
+                Quantitative aptitude and numerical ability.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>🧠 Reasoning</h3>
+            <p>
+                Logical reasoning and problem solving.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>💻 Programming</h3>
+            <p>
+                C, C++, Java and Python.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>📚 Data Structures</h3>
+            <p>
+                DSA and coding problem solving.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>🗄️ Database</h3>
+            <p>
+                SQL and DBMS concepts.
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>🌐 Core CS</h3>
+            <p>
+                Operating Systems, Networks and other
+                computer science subjects.
+            </p>
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- QUICK START -->
+
+    <h2>Quick Start</h2>
+
+    <p>
+        Start practicing regularly and check your
+        performance after every test.
+    </p>
+
+    <a href="/practice">
+        <button type="button">
+            Practice Now
+        </button>
+    </a>
+
+
+    <a href="/performance">
+        <button type="button">
+            Analyze Performance
+        </button>
+    </a>
+
+
+    <br><br>
+
+
+    <a href="/logout">
+        <button type="button">
+            Logout
+        </button>
+    </a>
+
+</div>
 
 </body>
 </html>

@@ -1,65 +1,509 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin - Add Question</title>
+    <title>Admin - Question Bank</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>Admin Panel</h1>
-        <p>Add a new placement practice question</p>
+    <h1>Admin Question Bank</h1>
 
-        <form method="POST" action="/admin">
+    <h2>Add Question</h2>
 
-            <input type="text" name="subject" placeholder="Subject (e.g. Java)" required>
-            <br><br>
+    <form method="POST" action="/admin">
 
-            <input type="text" name="topic" placeholder="Topic (e.g. Arrays)" required>
-            <br><br>
+        <label>Category</label>
+        <br><br>
 
-            <select name="difficulty" required>
-                <option value="">Select Difficulty</option>
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-            </select>
-            <br><br>
+        <select name="category" required>
+            <option value="">Select Category</option>
+            <option value="Aptitude">Aptitude</option>
+            <option value="Reasoning">Reasoning</option>
+            <option value="Verbal Ability">Verbal Ability</option>
+            <option value="Programming">Programming</option>
+            <option value="Data Structures & Algorithms">Data Structures & Algorithms</option>
+            <option value="Database">Database</option>
+            <option value="Core CS">Core CS</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Other">Other</option>
+        </select>
 
-            <textarea name="question" placeholder="Enter question" required></textarea>
-            <br><br>
+        <br><br>
 
-            <input type="text" name="option_a" placeholder="Option A" required>
-            <br><br>
+        <label>Subject</label>
+        <br><br>
 
-            <input type="text" name="option_b" placeholder="Option B" required>
-            <br><br>
+        <input type="text"
+               name="subject"
+               placeholder="e.g. Java"
+               required>
 
-            <input type="text" name="option_c" placeholder="Option C" required>
-            <br><br>
+        <br><br>
 
-            <input type="text" name="option_d" placeholder="Option D" required>
-            <br><br>
+        <label>Topic</label>
+        <br><br>
 
-            <select name="correct_answer" required>
-                <option value="">Select Correct Answer</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-            </select>
-            <br><br>
+        <input type="text"
+               name="topic"
+               placeholder="e.g. OOP"
+               required>
 
-            <textarea name="explanation" placeholder="Enter explanation" required></textarea>
-            <br><br>
+        <br><br>
 
-            <button type="submit">Add Question</button>
+        <label>Difficulty</label>
+        <br><br>
 
-        </form>
+        <select name="difficulty" required>
+            <option value="">Select Difficulty</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+        </select>
 
-    </div>
+        <br><br>
+
+        <label>Question</label>
+        <br><br>
+
+        <textarea name="question"
+                  placeholder="Enter question"
+                  rows="4"
+                  required></textarea>
+
+        <br><br>
+
+        <label>Option A</label>
+        <br><br>
+
+        <input type="text"
+               name="option_a"
+               placeholder="Option A"
+               required>
+
+        <br><br>
+
+        <label>Option B</label>
+        <br><br>
+
+        <input type="text"
+               name="option_b"
+               placeholder="Option B"
+               required>
+
+        <br><br>
+
+        <label>Option C</label>
+        <br><br>
+
+        <input type="text"
+               name="option_c"
+               placeholder="Option C"
+               required>
+
+        <br><br>
+
+        <label>Option D</label>
+        <br><br>
+
+        <input type="text"
+               name="option_d"
+               placeholder="Option D"
+               required>
+
+        <br><br>
+
+        <label>Correct Answer</label>
+        <br><br>
+
+        <select name="correct_answer" required>
+            <option value="">Select Answer</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+        </select>
+
+        <br><br>
+
+        <label>Explanation</label>
+        <br><br>
+
+        <textarea name="explanation"
+                  placeholder="Explain why this answer is correct"
+                  rows="5"
+                  required></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Add Question
+        </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <h2>Bulk Import Questions</h2>
+
+    <p>
+        Upload a CSV file containing multiple placement questions.
+    </p>
+
+    <form method="POST"
+          action="/import-questions"
+          enctype="multipart/form-data">
+
+        <input type="file"
+               name="question_file"
+               accept=".csv"
+               required>
+
+        <br><br>
+
+        <button type="submit">
+            Import Questions
+        </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <h2>Question Bank</h2>
+
+    {% if questions %}
+
+        {% for q in questions %}
+
+            <div class="question-box">
+
+                <h3>
+                    {{ loop.index }}. {{ q["question"] }}
+                </h3>
+
+                <p>
+                    <strong>Category:</strong>
+                    {{ q["category"] }}
+                </p>
+
+                <p>
+                    <strong>Subject:</strong>
+                    {{ q["subject"] }}
+                </p>
+
+                <p>
+                    <strong>Topic:</strong>
+                    {{ q["topic"] }}
+                </p>
+
+                <p>
+                    <strong>Difficulty:</strong>
+                    {{ q["difficulty"] }}
+                </p>
+
+                <p>
+                    <strong>A:</strong>
+                    {{ q["option_a"] }}
+                </p>
+
+                <p>
+                    <strong>B:</strong>
+                    {{ q["option_b"] }}
+                </p>
+
+                <p>
+                    <strong>C:</strong>
+                    {{ q["option_c"] }}
+                </p>
+
+                <p>
+                    <strong>D:</strong>
+                    {{ q["option_d"] }}
+                </p>
+
+                <p>
+                    <strong>Correct Answer:</strong>
+                    {{ q["correct_answer"] }}
+                </p>
+
+                <p>
+                    <strong>Explanation:</strong>
+                    {{ q["explanation"] }}
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No questions available.</p>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Question Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Admin Question Bank</h1>
+
+    <h2>Add Question</h2>
+
+    <form method="POST" action="/admin">
+
+        <label>Category</label>
+        <br><br>
+
+        <select name="category" required>
+            <option value="">Select Category</option>
+            <option value="Aptitude">Aptitude</option>
+            <option value="Reasoning">Reasoning</option>
+            <option value="Verbal Ability">Verbal Ability</option>
+            <option value="Programming">Programming</option>
+            <option value="Data Structures & Algorithms">Data Structures & Algorithms</option>
+            <option value="Database">Database</option>
+            <option value="Core CS">Core CS</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <br><br>
+
+        <label>Subject</label>
+        <br><br>
+
+        <input type="text"
+               name="subject"
+               placeholder="e.g. Java"
+               required>
+
+        <br><br>
+
+        <label>Topic</label>
+        <br><br>
+
+        <input type="text"
+               name="topic"
+               placeholder="e.g. OOP"
+               required>
+
+        <br><br>
+
+        <label>Difficulty</label>
+        <br><br>
+
+        <select name="difficulty" required>
+            <option value="">Select Difficulty</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+        </select>
+
+        <br><br>
+
+        <label>Question</label>
+        <br><br>
+
+        <textarea name="question"
+                  placeholder="Enter question"
+                  rows="4"
+                  required></textarea>
+
+        <br><br>
+
+        <label>Option A</label>
+        <br><br>
+
+        <input type="text"
+               name="option_a"
+               placeholder="Option A"
+               required>
+
+        <br><br>
+
+        <label>Option B</label>
+        <br><br>
+
+        <input type="text"
+               name="option_b"
+               placeholder="Option B"
+               required>
+
+        <br><br>
+
+        <label>Option C</label>
+        <br><br>
+
+        <input type="text"
+               name="option_c"
+               placeholder="Option C"
+               required>
+
+        <br><br>
+
+        <label>Option D</label>
+        <br><br>
+
+        <input type="text"
+               name="option_d"
+               placeholder="Option D"
+               required>
+
+        <br><br>
+
+        <label>Correct Answer</label>
+        <br><br>
+
+        <select name="correct_answer" required>
+            <option value="">Select Answer</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+        </select>
+
+        <br><br>
+
+        <label>Explanation</label>
+        <br><br>
+
+        <textarea name="explanation"
+                  placeholder="Explain why this answer is correct"
+                  rows="5"
+                  required></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Add Question
+        </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <h2>Bulk Import Questions</h2>
+
+    <p>
+        Upload a CSV file containing multiple placement questions.
+    </p>
+
+    <form method="POST"
+          action="/import-questions"
+          enctype="multipart/form-data">
+
+        <input type="file"
+               name="question_file"
+               accept=".csv"
+               required>
+
+        <br><br>
+
+        <button type="submit">
+            Import Questions
+        </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <h2>Question Bank</h2>
+
+    {% if questions %}
+
+        {% for q in questions %}
+
+            <div class="question-box">
+
+                <h3>
+                    {{ loop.index }}. {{ q["question"] }}
+                </h3>
+
+                <p>
+                    <strong>Category:</strong>
+                    {{ q["category"] }}
+                </p>
+
+                <p>
+                    <strong>Subject:</strong>
+                    {{ q["subject"] }}
+                </p>
+
+                <p>
+                    <strong>Topic:</strong>
+                    {{ q["topic"] }}
+                </p>
+
+                <p>
+                    <strong>Difficulty:</strong>
+                    {{ q["difficulty"] }}
+                </p>
+
+                <p>
+                    <strong>A:</strong>
+                    {{ q["option_a"] }}
+                </p>
+
+                <p>
+                    <strong>B:</strong>
+                    {{ q["option_b"] }}
+                </p>
+
+                <p>
+                    <strong>C:</strong>
+                    {{ q["option_c"] }}
+                </p>
+
+                <p>
+                    <strong>D:</strong>
+                    {{ q["option_d"] }}
+                </p>
+
+                <p>
+                    <strong>Correct Answer:</strong>
+                    {{ q["correct_answer"] }}
+                </p>
+
+                <p>
+                    <strong>Explanation:</strong>
+                    {{ q["explanation"] }}
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No questions available.</p>
+
+    {% endif %}
+
+</div>
 
 </body>
 </html>

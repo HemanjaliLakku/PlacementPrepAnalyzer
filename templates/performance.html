@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Performance - Placement Preparation Analyzer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>My Performance</h1>
+
+    <!-- PLACEMENT READINESS -->
+    <div class="result-box">
+
+        <h2>Placement Readiness</h2>
+
+        <p>
+            <strong>{{ readiness_score }}%</strong>
+        </p>
+
+        <p>
+            {{ readiness_message }}
+        </p>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- OVERALL SUMMARY -->
+
+    <h2>Overall Performance</h2>
+
+    <div class="dashboard-cards">
+
+        <div class="card">
+            <h3>Total Attempts</h3>
+            <p>
+                {{ summary["total_attempts"] }}
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Questions Attempted</h3>
+            <p>
+                {{ summary["total_questions"] }}
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Correct Answers</h3>
+            <p>
+                {{ summary["total_correct"] }}
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Wrong Answers</h3>
+            <p>
+                {{ summary["total_wrong"] }}
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Average Score</h3>
+            <p>
+                {{ "%.2f"|format(summary["average_percentage"]) }}%
+            </p>
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- PERSONALIZED RECOMMENDATIONS -->
+
+    <h2>Personalized Recommendations</h2>
+
+    {% if recommendations %}
+
+        {% for recommendation in recommendations %}
+
+            <div class="question-box">
+
+                <h3>
+                    {{ recommendation["subject"] }}
+                    -
+                    {{ recommendation["topic"] }}
+                </h3>
+
+                <p>
+                    Current Performance:
+                    <strong>
+                        {{ recommendation["percentage"] }}%
+                    </strong>
+                </p>
+
+                <p>
+                    {{ recommendation["message"] }}
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            Complete some practice tests to receive
+            personalized recommendations.
+        </p>
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <!-- WEAK TOPICS -->
+
+    <h2>Weak Topics</h2>
+
+    {% if weak_topics %}
+
+        {% for topic in weak_topics %}
+
+            <div class="question-box">
+
+                <h3>
+                    {{ topic["subject"] }}
+                    -
+                    {{ topic["topic"] }}
+                </h3>
+
+                <p>
+                    Performance:
+                    <strong>
+                        {{ topic["percentage"] }}%
+                    </strong>
+                </p>
+
+                <p>
+                    Correct:
+                    {{ topic["correct_answers"] }}
+                    /
+                    {{ topic["total_questions"] }}
+                </p>
+
+                <p>
+                    Recommendation:
+                    Practice this topic more.
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No weak topics identified yet.
+        </p>
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <!-- NEEDS IMPROVEMENT -->
+
+    <h2>Needs Improvement</h2>
+
+    {% if improvement_topics %}
+
+        {% for topic in improvement_topics %}
+
+            <div class="question-box">
+
+                <h3>
+                    {{ topic["subject"] }}
+                    -
+                    {{ topic["topic"] }}
+                </h3>
+
+                <p>
+                    Performance:
+                    <strong>
+                        {{ topic["percentage"] }}%
+                    </strong>
+                </p>
+
+                <p>
+                    Keep practicing to improve.
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No topics currently need improvement.
+        </p>
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <!-- STRONG TOPICS -->
+
+    <h2>Strong Topics</h2>
+
+    {% if strong_topics %}
+
+        {% for topic in strong_topics %}
+
+            <div class="question-box">
+
+                <h3>
+                    {{ topic["subject"] }}
+                    -
+                    {{ topic["topic"] }}
+                </h3>
+
+                <p>
+                    Performance:
+                    <strong>
+                        {{ topic["percentage"] }}%
+                    </strong>
+                </p>
+
+                <p>
+                    Correct:
+                    {{ topic["correct_answers"] }}
+                    /
+                    {{ topic["total_questions"] }}
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No strong topics identified yet.
+        </p>
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <!-- TOPIC-WISE PERFORMANCE -->
+
+    <h2>Topic-wise Performance</h2>
+
+    {% if topic_performance %}
+
+        {% for topic in topic_performance %}
+
+            <div class="question-box">
+
+                <h3>
+                    {{ topic["subject"] }}
+                    -
+                    {{ topic["topic"] }}
+                </h3>
+
+                <p>
+                    Total Questions:
+                    {{ topic["total_questions"] }}
+                </p>
+
+                <p>
+                    Correct Answers:
+                    {{ topic["correct_answers"] }}
+                </p>
+
+                <p>
+                    Score:
+                    <strong>
+                        {{ topic["percentage"] }}%
+                    </strong>
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            Complete a practice session to see
+            topic-wise performance.
+        </p>
+
+    {% endif %}
+
+
+    <hr>
+
+
+    <!-- PRACTICE HISTORY -->
+
+    <h2>Practice History</h2>
+
+    {% if attempts %}
+
+        {% for attempt in attempts %}
+
+            <div class="question-box">
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ attempt["attempted_at"] }}
+                </p>
+
+                <p>
+                    <strong>Category:</strong>
+                    {{ attempt["category"] or "N/A" }}
+                </p>
+
+                <p>
+                    <strong>Subject:</strong>
+                    {{ attempt["subject"] }}
+                </p>
+
+                <p>
+                    <strong>Topic:</strong>
+                    {{ attempt["topic"] or "N/A" }}
+                </p>
+
+                <p>
+                    <strong>Total:</strong>
+                    {{ attempt["total_questions"] }}
+                </p>
+
+                <p>
+                    <strong>Correct:</strong>
+                    {{ attempt["correct_answers"] }}
+                </p>
+
+                <p>
+                    <strong>Wrong:</strong>
+                    {{ attempt["wrong_answers"] }}
+                </p>
+
+                <p>
+                    <strong>Percentage:</strong>
+                    {{ "%.2f"|format(attempt["percentage"]) }}%
+                </p>
+
+            </div>
+
+            <hr>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No practice attempts yet.
+        </p>
+
+    {% endif %}
+
+
+    <br>
+
+
+    <a href="/practice">
+        <button type="button">
+            Start Practice
+        </button>
+    </a>
+
+
+    <a href="/dashboard">
+        <button type="button">
+            Back to Dashboard
+        </button>
+    </a>
+
+</div>
+
+</body>
+</html>
