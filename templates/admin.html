@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin - Question Bank</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Admin - Placement Preparation Analyzer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
@@ -11,132 +13,376 @@
 
     <h1>Admin Question Bank</h1>
 
-    <h2>Add Question</h2>
+    <p>
+        Add questions manually, import them in bulk,
+        or generate new questions using local AI.
+    </p>
 
-    <form method="POST" action="/admin">
 
-        <label>Category</label>
+    <!-- ==================================================
+         AI QUESTION GENERATOR
+    ================================================== -->
+
+    <h2>🤖 AI Question Generator</h2>
+
+    <div class="question-box">
+
+        <form method="POST"
+              action="/generate-ai-questions">
+
+            <label for="ai_category">
+                Category
+            </label>
+            <br><br>
+
+            <select name="category"
+                    id="ai_category"
+                    required>
+
+                <option value="">
+                    Select Category
+                </option>
+
+                <option value="Aptitude">
+                    Aptitude
+                </option>
+
+                <option value="Reasoning">
+                    Reasoning
+                </option>
+
+                <option value="Verbal Ability">
+                    Verbal Ability
+                </option>
+
+                <option value="Programming">
+                    Programming
+                </option>
+
+                <option value="Data Structures & Algorithms">
+                    Data Structures & Algorithms
+                </option>
+
+                <option value="Database">
+                    Database
+                </option>
+
+                <option value="Core CS">
+                    Core CS
+                </option>
+
+                <option value="Web Development">
+                    Web Development
+                </option>
+
+            </select>
+
+
+            <br><br>
+
+
+            <label for="ai_subject">
+                Subject
+            </label>
+            <br><br>
+
+            <input type="text"
+                   name="subject"
+                   id="ai_subject"
+                   placeholder="Example: Java"
+                   required>
+
+
+            <br><br>
+
+
+            <label for="ai_topic">
+                Topic
+            </label>
+            <br><br>
+
+            <input type="text"
+                   name="topic"
+                   id="ai_topic"
+                   placeholder="Example: OOP"
+                   required>
+
+
+            <br><br>
+
+
+            <label for="ai_difficulty">
+                Difficulty
+            </label>
+            <br><br>
+
+            <select name="difficulty"
+                    id="ai_difficulty"
+                    required>
+
+                <option value="">
+                    Select Difficulty
+                </option>
+
+                <option value="Easy">
+                    Easy
+                </option>
+
+                <option value="Medium">
+                    Medium
+                </option>
+
+                <option value="Hard">
+                    Hard
+                </option>
+
+            </select>
+
+
+            <br><br>
+
+
+            <label for="ai_count">
+                Number of Questions
+            </label>
+            <br><br>
+
+            <select name="count"
+                    id="ai_count">
+
+                <option value="5">
+                    5 Questions
+                </option>
+
+                <option value="10">
+                    10 Questions
+                </option>
+
+                <option value="20">
+                    20 Questions
+                </option>
+
+                <option value="50">
+                    50 Questions
+                </option>
+
+                <option value="100">
+                    100 Questions
+                </option>
+
+            </select>
+
+
+            <br><br>
+
+
+            <button type="submit">
+                Generate Questions
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- ==================================================
+         MANUAL QUESTION ADD
+    ================================================== -->
+
+    <h2>➕ Add Question Manually</h2>
+
+    <form method="POST"
+          action="/admin">
+
+
+        <label>
+            Category
+        </label>
         <br><br>
 
-        <select name="category" required>
-            <option value="">Select Category</option>
-            <option value="Aptitude">Aptitude</option>
-            <option value="Reasoning">Reasoning</option>
-            <option value="Verbal Ability">Verbal Ability</option>
-            <option value="Programming">Programming</option>
-            <option value="Data Structures & Algorithms">Data Structures & Algorithms</option>
-            <option value="Database">Database</option>
-            <option value="Core CS">Core CS</option>
-            <option value="Web Development">Web Development</option>
-            <option value="Other">Other</option>
-        </select>
+        <input type="text"
+               name="category"
+               placeholder="Example: Programming"
+               required>
+
 
         <br><br>
 
-        <label>Subject</label>
+
+        <label>
+            Subject
+        </label>
         <br><br>
 
         <input type="text"
                name="subject"
-               placeholder="e.g. Java"
+               placeholder="Example: Java"
                required>
+
 
         <br><br>
 
-        <label>Topic</label>
+
+        <label>
+            Topic
+        </label>
         <br><br>
 
         <input type="text"
                name="topic"
-               placeholder="e.g. OOP"
+               placeholder="Example: OOP"
                required>
 
+
         <br><br>
 
-        <label>Difficulty</label>
+
+        <label>
+            Difficulty
+        </label>
         <br><br>
 
-        <select name="difficulty" required>
-            <option value="">Select Difficulty</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
+        <select name="difficulty"
+                required>
+
+            <option value="">
+                Select Difficulty
+            </option>
+
+            <option value="Easy">
+                Easy
+            </option>
+
+            <option value="Medium">
+                Medium
+            </option>
+
+            <option value="Hard">
+                Hard
+            </option>
+
         </select>
 
+
         <br><br>
 
-        <label>Question</label>
+
+        <label>
+            Question
+        </label>
         <br><br>
 
         <textarea name="question"
-                  placeholder="Enter question"
                   rows="4"
+                  placeholder="Enter question"
                   required></textarea>
+
 
         <br><br>
 
-        <label>Option A</label>
+
+        <label>
+            Option A
+        </label>
         <br><br>
 
         <input type="text"
                name="option_a"
-               placeholder="Option A"
                required>
+
 
         <br><br>
 
-        <label>Option B</label>
+
+        <label>
+            Option B
+        </label>
         <br><br>
 
         <input type="text"
                name="option_b"
-               placeholder="Option B"
                required>
+
 
         <br><br>
 
-        <label>Option C</label>
+
+        <label>
+            Option C
+        </label>
         <br><br>
 
         <input type="text"
                name="option_c"
-               placeholder="Option C"
                required>
+
 
         <br><br>
 
-        <label>Option D</label>
+
+        <label>
+            Option D
+        </label>
         <br><br>
 
         <input type="text"
                name="option_d"
-               placeholder="Option D"
                required>
 
+
         <br><br>
 
-        <label>Correct Answer</label>
+
+        <label>
+            Correct Answer
+        </label>
         <br><br>
 
-        <select name="correct_answer" required>
-            <option value="">Select Answer</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
+        <select name="correct_answer"
+                required>
+
+            <option value="">
+                Select Answer
+            </option>
+
+            <option value="A">
+                A
+            </option>
+
+            <option value="B">
+                B
+            </option>
+
+            <option value="C">
+                C
+            </option>
+
+            <option value="D">
+                D
+            </option>
+
         </select>
 
+
         <br><br>
 
-        <label>Explanation</label>
+
+        <label>
+            Explanation
+        </label>
         <br><br>
 
         <textarea name="explanation"
-                  placeholder="Explain why this answer is correct"
-                  rows="5"
+                  rows="4"
+                  placeholder="Enter explanation"
                   required></textarea>
 
+
         <br><br>
+
 
         <button type="submit">
             Add Question
@@ -148,43 +394,69 @@
     <hr>
 
 
-    <h2>Bulk Import Questions</h2>
+    <!-- ==================================================
+         CSV BULK IMPORT
+    ================================================== -->
 
-    <p>
-        Upload a CSV file containing multiple placement questions.
-    </p>
+    <h2>📂 Bulk Import Questions</h2>
 
-    <form method="POST"
-          action="/import-questions"
-          enctype="multipart/form-data">
+    <div class="question-box">
 
-        <input type="file"
-               name="question_file"
-               accept=".csv"
-               required>
+        <p>
+            Upload a CSV file containing multiple questions.
+        </p>
 
-        <br><br>
 
-        <button type="submit">
-            Import Questions
-        </button>
+        <form method="POST"
+              action="/import-questions"
+              enctype="multipart/form-data">
 
-    </form>
+            <label>
+                Select CSV File
+            </label>
+
+            <br><br>
+
+            <input type="file"
+                   name="question_file"
+                   accept=".csv"
+                   required>
+
+            <br><br>
+
+            <button type="submit">
+                Import Questions
+            </button>
+
+        </form>
+
+    </div>
 
 
     <hr>
 
 
-    <h2>Question Bank</h2>
+    <!-- ==================================================
+         CURRENT QUESTION BANK
+    ================================================== -->
+
+    <h2>📚 Current Question Bank</h2>
 
     {% if questions %}
+
+        <p>
+            Total Questions:
+            <strong>{{ questions|length }}</strong>
+        </p>
+
 
         {% for q in questions %}
 
             <div class="question-box">
 
                 <h3>
-                    {{ loop.index }}. {{ q["question"] }}
+                    {{ loop.index }}.
+                    {{ q["question"] }}
                 </h3>
 
                 <p>
@@ -208,300 +480,48 @@
                 </p>
 
                 <p>
-                    <strong>A:</strong>
-                    {{ q["option_a"] }}
-                </p>
-
-                <p>
-                    <strong>B:</strong>
-                    {{ q["option_b"] }}
-                </p>
-
-                <p>
-                    <strong>C:</strong>
-                    {{ q["option_c"] }}
-                </p>
-
-                <p>
-                    <strong>D:</strong>
-                    {{ q["option_d"] }}
-                </p>
-
-                <p>
-                    <strong>Correct Answer:</strong>
+                    <strong>Answer:</strong>
                     {{ q["correct_answer"] }}
                 </p>
 
-                <p>
-                    <strong>Explanation:</strong>
-                    {{ q["explanation"] }}
-                </p>
-
             </div>
-
-            <hr>
 
         {% endfor %}
 
     {% else %}
 
-        <p>No questions available.</p>
+        <p>
+            No questions in the question bank yet.
+        </p>
 
     {% endif %}
 
-</div>
 
-</body>
-</html><!DOCTYPE html>
-<html>
-<head>
-    <title>Admin - Question Bank</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <br>
 
-<body>
 
-<div class="container">
-
-    <h1>Admin Question Bank</h1>
-
-    <h2>Add Question</h2>
-
-    <form method="POST" action="/admin">
-
-        <label>Category</label>
-        <br><br>
-
-        <select name="category" required>
-            <option value="">Select Category</option>
-            <option value="Aptitude">Aptitude</option>
-            <option value="Reasoning">Reasoning</option>
-            <option value="Verbal Ability">Verbal Ability</option>
-            <option value="Programming">Programming</option>
-            <option value="Data Structures & Algorithms">Data Structures & Algorithms</option>
-            <option value="Database">Database</option>
-            <option value="Core CS">Core CS</option>
-            <option value="Web Development">Web Development</option>
-            <option value="Other">Other</option>
-        </select>
-
-        <br><br>
-
-        <label>Subject</label>
-        <br><br>
-
-        <input type="text"
-               name="subject"
-               placeholder="e.g. Java"
-               required>
-
-        <br><br>
-
-        <label>Topic</label>
-        <br><br>
-
-        <input type="text"
-               name="topic"
-               placeholder="e.g. OOP"
-               required>
-
-        <br><br>
-
-        <label>Difficulty</label>
-        <br><br>
-
-        <select name="difficulty" required>
-            <option value="">Select Difficulty</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-        </select>
-
-        <br><br>
-
-        <label>Question</label>
-        <br><br>
-
-        <textarea name="question"
-                  placeholder="Enter question"
-                  rows="4"
-                  required></textarea>
-
-        <br><br>
-
-        <label>Option A</label>
-        <br><br>
-
-        <input type="text"
-               name="option_a"
-               placeholder="Option A"
-               required>
-
-        <br><br>
-
-        <label>Option B</label>
-        <br><br>
-
-        <input type="text"
-               name="option_b"
-               placeholder="Option B"
-               required>
-
-        <br><br>
-
-        <label>Option C</label>
-        <br><br>
-
-        <input type="text"
-               name="option_c"
-               placeholder="Option C"
-               required>
-
-        <br><br>
-
-        <label>Option D</label>
-        <br><br>
-
-        <input type="text"
-               name="option_d"
-               placeholder="Option D"
-               required>
-
-        <br><br>
-
-        <label>Correct Answer</label>
-        <br><br>
-
-        <select name="correct_answer" required>
-            <option value="">Select Answer</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-        </select>
-
-        <br><br>
-
-        <label>Explanation</label>
-        <br><br>
-
-        <textarea name="explanation"
-                  placeholder="Explain why this answer is correct"
-                  rows="5"
-                  required></textarea>
-
-        <br><br>
-
-        <button type="submit">
-            Add Question
+    <a href="/dashboard">
+        <button type="button">
+            Back to Dashboard
         </button>
-
-    </form>
-
-
-    <hr>
+    </a>
 
 
-    <h2>Bulk Import Questions</h2>
-
-    <p>
-        Upload a CSV file containing multiple placement questions.
-    </p>
-
-    <form method="POST"
-          action="/import-questions"
-          enctype="multipart/form-data">
-
-        <input type="file"
-               name="question_file"
-               accept=".csv"
-               required>
-
-        <br><br>
-
-        <button type="submit">
-            Import Questions
+    <a href="/practice">
+        <button type="button">
+            Go to Practice
         </button>
-
-    </form>
-
-
-    <hr>
+    </a>
 
 
-    <h2>Question Bank</h2>
+    <br><br>
 
-    {% if questions %}
 
-        {% for q in questions %}
-
-            <div class="question-box">
-
-                <h3>
-                    {{ loop.index }}. {{ q["question"] }}
-                </h3>
-
-                <p>
-                    <strong>Category:</strong>
-                    {{ q["category"] }}
-                </p>
-
-                <p>
-                    <strong>Subject:</strong>
-                    {{ q["subject"] }}
-                </p>
-
-                <p>
-                    <strong>Topic:</strong>
-                    {{ q["topic"] }}
-                </p>
-
-                <p>
-                    <strong>Difficulty:</strong>
-                    {{ q["difficulty"] }}
-                </p>
-
-                <p>
-                    <strong>A:</strong>
-                    {{ q["option_a"] }}
-                </p>
-
-                <p>
-                    <strong>B:</strong>
-                    {{ q["option_b"] }}
-                </p>
-
-                <p>
-                    <strong>C:</strong>
-                    {{ q["option_c"] }}
-                </p>
-
-                <p>
-                    <strong>D:</strong>
-                    {{ q["option_d"] }}
-                </p>
-
-                <p>
-                    <strong>Correct Answer:</strong>
-                    {{ q["correct_answer"] }}
-                </p>
-
-                <p>
-                    <strong>Explanation:</strong>
-                    {{ q["explanation"] }}
-                </p>
-
-            </div>
-
-            <hr>
-
-        {% endfor %}
-
-    {% else %}
-
-        <p>No questions available.</p>
-
-    {% endif %}
+    <a href="/logout">
+        <button type="button">
+            Logout
+        </button>
+    </a>
 
 </div>
 

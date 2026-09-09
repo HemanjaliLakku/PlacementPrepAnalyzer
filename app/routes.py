@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, session
 from database import get_db_connection
+from ai_generator import generate_questions, save_questions
 import csv
 
 main = Blueprint("main", __name__)
@@ -149,10 +150,8 @@ def admin():
             "explanation"
         ].strip()
 
-
         try:
 
-            # Duplicate check
             existing = conn.execute("""
                 SELECT id
                 FROM questions
@@ -161,15 +160,12 @@ def admin():
                 question,
             )).fetchone()
 
-
             if existing:
 
                 conn.close()
 
                 return "This question already exists."
 
-
-            # Insert question
             conn.execute("""
                 INSERT INTO questions
                 (
@@ -200,7 +196,6 @@ def admin():
                 explanation
             ))
 
-
             conn.commit()
 
         except Exception as e:
@@ -209,13 +204,11 @@ def admin():
 
             return f"Question could not be added: {e}"
 
-
         conn.close()
 
         return redirect("/admin")
 
 
-    # Get all questions
     questions = conn.execute("""
         SELECT *
         FROM questions
@@ -224,7 +217,6 @@ def admin():
 
     conn.close()
 
-
     return render_template(
         "admin.html",
         questions=questions
@@ -232,26 +224,106 @@ def admin():
 
 
 # ==================================================
+# AI QUESTION GENERATOR
+# ==================================================
+
+@main.route(
+    "/generate-ai-questions",
+    methods=["POST"]
+)
+def generate_ai_questions():
+
+    category = request.form[
+        "category"
+    ].strip()
+
+    subject = request.form[
+        "subject"
+    ].strip()
+
+    topic = request.form[
+        "topic"
+    ].strip()
+
+    difficulty = request.form[
+        "difficulty"
+    ].strip()
+
+    count = request.form.get(
+        "count",
+        5,
+        type=int
+    )
+
+    if count < 1:
+        count = 5
+
+    if count > 100:
+        count = 100
+
+
+    try:
+
+        # Generate questions using Ollama
+        generated_questions = generate_questions(
+            subject,
+            topic,
+            difficulty,
+            count
+        )
+
+
+        # Save valid questions
+        result = save_questions(
+            generated_questions,
+            category,
+            subject,
+            topic,
+            difficulty
+        )
+
+
+        return (
+            "<h2>AI Generation Completed</h2>"
+            f"<p>{result['added']} questions added.</p>"
+            f"<p>{result['skipped']} duplicates skipped.</p>"
+            f"<p>{result['invalid']} invalid questions skipped.</p>"
+            '<br>'
+            '<a href="/admin">Back to Admin</a>'
+        )
+
+
+    except Exception as e:
+
+        return (
+            "<h2>AI Question Generation Failed</h2>"
+            f"<p>{e}</p>"
+            '<br>'
+            '<a href="/admin">Back to Admin</a>'
+        )
+
+
+# ==================================================
 # BULK CSV IMPORT
 # ==================================================
 
-@main.route("/import-questions", methods=["POST"])
+@main.route(
+    "/import-questions",
+    methods=["POST"]
+)
 def import_questions():
 
     file = request.files.get(
         "question_file"
     )
 
-
     if not file:
 
         return "Please select a CSV file."
 
-
     if file.filename == "":
 
         return "Please select a CSV file."
-
 
     if not file.filename.lower().endswith(".csv"):
 
@@ -266,12 +338,16 @@ def import_questions():
 
     try:
 
-        content = file.stream.read().decode(
-            "utf-8-sig"
-        ).splitlines()
+        content = (
+            file.stream
+            .read()
+            .decode("utf-8-sig")
+            .splitlines()
+        )
 
-
-        reader = csv.DictReader(content)
+        reader = csv.DictReader(
+            content
+        )
 
 
         required_columns = {
@@ -320,7 +396,6 @@ def import_questions():
 
 
             if not question_text:
-
                 continue
 
 
@@ -375,6 +450,7 @@ def import_questions():
 
 
         conn.commit()
+
         conn.close()
 
 
@@ -388,6 +464,7 @@ def import_questions():
     except Exception as e:
 
         conn.rollback()
+
         conn.close()
 
         return f"Import failed: {e}"
@@ -423,13 +500,11 @@ def practice():
     )
 
 
-    # Prevent invalid question count
     if count < 1:
 
         count = 5
 
 
-    # One test maximum = 100 questions
     if count > 100:
 
         count = 100
@@ -438,10 +513,7 @@ def practice():
     conn = get_db_connection()
 
 
-    # --------------------------------------------------
-    # DYNAMIC CATEGORIES
-    # --------------------------------------------------
-
+    # Categories
     categories = conn.execute("""
         SELECT DISTINCT category
         FROM questions
@@ -451,10 +523,7 @@ def practice():
     """).fetchall()
 
 
-    # --------------------------------------------------
-    # DYNAMIC SUBJECTS
-    # --------------------------------------------------
-
+    # Subjects + category
     subjects = conn.execute("""
         SELECT DISTINCT
             category,
@@ -466,10 +535,7 @@ def practice():
     """).fetchall()
 
 
-    # --------------------------------------------------
-    # DYNAMIC TOPICS
-    # --------------------------------------------------
-
+    # Topics + category + subject
     topics = conn.execute("""
         SELECT DISTINCT
             category,
@@ -482,10 +548,7 @@ def practice():
     """).fetchall()
 
 
-    # --------------------------------------------------
-    # DYNAMIC DIFFICULTIES
-    # --------------------------------------------------
-
+    # Difficulties
     difficulties = conn.execute("""
         SELECT DISTINCT difficulty
         FROM questions
@@ -495,10 +558,7 @@ def practice():
     """).fetchall()
 
 
-    # --------------------------------------------------
-    # NO FILTER SELECTED
-    # --------------------------------------------------
-
+    # No filter selected
     if (
         not category
         and not subject
@@ -521,10 +581,6 @@ def practice():
             difficulty=None
         )
 
-
-    # --------------------------------------------------
-    # PRACTICE QUESTION QUERY
-    # --------------------------------------------------
 
     query = """
         SELECT *
@@ -579,7 +635,6 @@ def practice():
         )
 
 
-    # Random questions
     query += """
         ORDER BY RANDOM()
         LIMIT ?
@@ -601,23 +656,14 @@ def practice():
 
     return render_template(
         "practice.html",
-
         questions=questions,
-
         categories=categories,
-
         subjects=subjects,
-
         topics=topics,
-
         difficulties=difficulties,
-
         category=category,
-
         subject=subject,
-
         topic=topic,
-
         difficulty=difficulty
     )
 
@@ -636,7 +682,6 @@ def submit_practice():
         "user_id"
     )
 
-
     question_ids = request.form.getlist(
         "question_ids"
     )
@@ -649,11 +694,9 @@ def submit_practice():
 
     conn = get_db_connection()
 
-
     questions = []
 
 
-    # Get only submitted questions
     for question_id in question_ids:
 
         question = conn.execute("""
@@ -675,7 +718,6 @@ def submit_practice():
     score = 0
 
 
-    # Check answers
     for q in questions:
 
         user_answer = request.form.get(
@@ -683,7 +725,9 @@ def submit_practice():
         )
 
 
-        if user_answer == q["correct_answer"]:
+        if user_answer == q[
+            "correct_answer"
+        ]:
 
             score += 1
 
@@ -691,7 +735,6 @@ def submit_practice():
     total = len(
         questions
     )
-
 
     wrong = total - score
 
@@ -708,21 +751,22 @@ def submit_practice():
         percentage = 0
 
 
-    # First question determines session subject/category
     if questions:
 
-        category = questions[0]["category"]
+        category = questions[0][
+            "category"
+        ]
 
-        subject = questions[0]["subject"]
+        subject = questions[0][
+            "subject"
+        ]
 
     else:
 
         category = None
-
         subject = "Unknown"
 
 
-    # Get topics
     topics = sorted({
         q["topic"]
         for q in questions
@@ -734,10 +778,6 @@ def submit_practice():
         topics
     )
 
-
-    # --------------------------------------------------
-    # SAVE PERFORMANCE
-    # --------------------------------------------------
 
     conn.execute("""
         INSERT INTO attempts
@@ -767,6 +807,7 @@ def submit_practice():
 
 
     conn.commit()
+
     conn.close()
 
 
@@ -800,10 +841,7 @@ def performance():
     conn = get_db_connection()
 
 
-    # --------------------------------------------------
-    # PRACTICE HISTORY
-    # --------------------------------------------------
-
+    # Practice history
     attempts = conn.execute("""
         SELECT *
         FROM attempts
@@ -814,10 +852,7 @@ def performance():
     )).fetchall()
 
 
-    # --------------------------------------------------
-    # OVERALL SUMMARY
-    # --------------------------------------------------
-
+    # Overall summary
     summary = conn.execute("""
         SELECT
 
@@ -851,10 +886,7 @@ def performance():
     )).fetchone()
 
 
-    # --------------------------------------------------
-    # TOPIC PERFORMANCE
-    # --------------------------------------------------
-
+    # Topic performance
     topic_performance = conn.execute("""
         SELECT
 
@@ -888,6 +920,7 @@ def performance():
         GROUP BY subject, topic
 
         ORDER BY percentage ASC
+
     """, (
         user_id,
     )).fetchall()
@@ -896,64 +929,40 @@ def performance():
     conn.close()
 
 
-    # --------------------------------------------------
-    # WEAK TOPICS
-    # --------------------------------------------------
-
+    # Weak topics
     weak_topics = [
-
         row
-
         for row in topic_performance
-
         if row["percentage"] < 50
-
     ]
 
 
-    # --------------------------------------------------
-    # NEEDS IMPROVEMENT
-    # --------------------------------------------------
-
+    # Improvement topics
     improvement_topics = [
-
         row
-
         for row in topic_performance
-
         if (
             row["percentage"] >= 50
             and row["percentage"] < 75
         )
-
     ]
 
 
-    # --------------------------------------------------
-    # STRONG TOPICS
-    # --------------------------------------------------
-
+    # Strong topics
     strong_topics = [
-
         row
-
         for row in topic_performance
-
         if row["percentage"] >= 75
-
     ]
 
 
-    # --------------------------------------------------
-    # PERSONALIZED RECOMMENDATIONS
-    # --------------------------------------------------
-
+    # Recommendations
     recommendations = []
 
 
-    for topic in topic_performance:
+    for topic_data in topic_performance:
 
-        percentage = topic[
+        percentage = topic_data[
             "percentage"
         ]
 
@@ -963,10 +972,10 @@ def performance():
             recommendations.append({
 
                 "subject":
-                    topic["subject"],
+                    topic_data["subject"],
 
                 "topic":
-                    topic["topic"],
+                    topic_data["topic"],
 
                 "percentage":
                     percentage,
@@ -984,10 +993,10 @@ def performance():
             recommendations.append({
 
                 "subject":
-                    topic["subject"],
+                    topic_data["subject"],
 
                 "topic":
-                    topic["topic"],
+                    topic_data["topic"],
 
                 "percentage":
                     percentage,
@@ -1005,10 +1014,10 @@ def performance():
             recommendations.append({
 
                 "subject":
-                    topic["subject"],
+                    topic_data["subject"],
 
                 "topic":
-                    topic["topic"],
+                    topic_data["topic"],
 
                 "percentage":
                     percentage,
@@ -1021,10 +1030,7 @@ def performance():
             })
 
 
-    # --------------------------------------------------
-    # PLACEMENT READINESS
-    # --------------------------------------------------
-
+    # Placement readiness
     readiness_score = round(
         summary["average_percentage"],
         2
@@ -1038,14 +1044,12 @@ def performance():
             "Focus on your weak topics."
         )
 
-
     elif readiness_score < 60:
 
         readiness_message = (
             "You are making progress. "
             "Continue regular practice."
         )
-
 
     elif readiness_score < 75:
 
@@ -1054,14 +1058,12 @@ def performance():
             "Focus on weak areas to improve further."
         )
 
-
     elif readiness_score < 90:
 
         readiness_message = (
             "Very good preparation. "
             "Keep practicing consistently."
         )
-
 
     else:
 
@@ -1072,31 +1074,14 @@ def performance():
 
 
     return render_template(
-
         "performance.html",
-
         attempts=attempts,
-
         summary=summary,
-
-        topic_performance=
-            topic_performance,
-
-        weak_topics=
-            weak_topics,
-
-        improvement_topics=
-            improvement_topics,
-
-        strong_topics=
-            strong_topics,
-
-        recommendations=
-            recommendations,
-
-        readiness_score=
-            readiness_score,
-
-        readiness_message=
-            readiness_message
+        topic_performance=topic_performance,
+        weak_topics=weak_topics,
+        improvement_topics=improvement_topics,
+        strong_topics=strong_topics,
+        recommendations=recommendations,
+        readiness_score=readiness_score,
+        readiness_message=readiness_message
     )
