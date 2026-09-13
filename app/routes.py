@@ -32,6 +32,16 @@ def register():
 
         try:
 
+            existing_user = conn.execute("""
+                SELECT id
+                FROM users
+                WHERE email = ?
+            """, (email,)).fetchone()
+
+            if existing_user:
+                conn.close()
+                return "Email already registered."
+
             conn.execute("""
                 INSERT INTO users
                 (name, email, password)
@@ -113,9 +123,74 @@ def logout():
 @main.route("/dashboard")
 def dashboard():
 
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect("/login")
+
+    conn = get_db_connection()
+
+    stats = conn.execute("""
+        SELECT
+            COUNT(*) AS tests_taken,
+            COALESCE(SUM(total_questions), 0) AS questions_practiced,
+            COALESCE(SUM(correct_answers), 0) AS correct_answers,
+            COALESCE(SUM(wrong_answers), 0) AS wrong_answers,
+            COALESCE(AVG(percentage), 0) AS average_accuracy
+        FROM attempts
+        WHERE user_id = ?
+    """, (user_id,)).fetchone()
+
+    weak_topics = conn.execute("""
+        SELECT
+            subject,
+            topic,
+            SUM(total_questions) AS total_questions,
+            SUM(correct_answers) AS correct_answers,
+            ROUND(
+                SUM(correct_answers) * 100.0 /
+                NULLIF(SUM(total_questions), 0),
+                2
+            ) AS percentage
+        FROM attempts
+        WHERE user_id = ?
+        GROUP BY subject, topic
+        HAVING (
+            SUM(correct_answers) * 100.0 /
+            NULLIF(SUM(total_questions), 0)
+        ) < 50
+        ORDER BY percentage ASC
+        LIMIT 5
+    """, (user_id,)).fetchall()
+
+    recent_attempts = conn.execute("""
+        SELECT *
+        FROM attempts
+        WHERE user_id = ?
+        ORDER BY attempted_at DESC
+        LIMIT 5
+    """, (user_id,)).fetchall()
+
+    conn.close()
+
+    average_accuracy = round(
+        stats["average_accuracy"] or 0,
+        2
+    )
+
+    readiness_score = average_accuracy
+
     return render_template(
         "dashboard.html",
-        user_name=session.get("user_name")
+        user_name=session.get("user_name"),
+        tests_taken=stats["tests_taken"],
+        questions_practiced=stats["questions_practiced"],
+        correct_answers=stats["correct_answers"],
+        wrong_answers=stats["wrong_answers"],
+        average_accuracy=average_accuracy,
+        readiness_score=readiness_score,
+        weak_topics=weak_topics,
+        recent_attempts=recent_attempts
     )
 
 
@@ -155,7 +230,8 @@ def admin():
             existing = conn.execute("""
                 SELECT id
                 FROM questions
-                WHERE question = ?
+                WHERE LOWER(TRIM(question))
+                    = LOWER(TRIM(?))
             """, (
                 question,
             )).fetchone()
@@ -207,7 +283,6 @@ def admin():
         conn.close()
 
         return redirect("/admin")
-
 
     questions = conn.execute("""
         SELECT *
@@ -261,10 +336,8 @@ def generate_ai_questions():
     if count > 100:
         count = 100
 
-
     try:
 
-        # Generate questions using Ollama
         generated_questions = generate_questions(
             subject,
             topic,
@@ -272,8 +345,6 @@ def generate_ai_questions():
             count
         )
 
-
-        # Save valid questions
         result = save_questions(
             generated_questions,
             category,
@@ -282,23 +353,21 @@ def generate_ai_questions():
             difficulty
         )
 
-
         return (
             "<h2>AI Generation Completed</h2>"
             f"<p>{result['added']} questions added.</p>"
             f"<p>{result['skipped']} duplicates skipped.</p>"
             f"<p>{result['invalid']} invalid questions skipped.</p>"
-            '<br>'
+            "<br>"
             '<a href="/admin">Back to Admin</a>'
         )
-
 
     except Exception as e:
 
         return (
             "<h2>AI Question Generation Failed</h2>"
             f"<p>{e}</p>"
-            '<br>'
+            "<br>"
             '<a href="/admin">Back to Admin</a>'
         )
 
@@ -318,23 +387,18 @@ def import_questions():
     )
 
     if not file:
-
         return "Please select a CSV file."
 
     if file.filename == "":
-
         return "Please select a CSV file."
 
     if not file.filename.lower().endswith(".csv"):
-
         return "Only CSV files are allowed."
-
 
     conn = get_db_connection()
 
     added = 0
     skipped = 0
-
 
     try:
 
@@ -345,10 +409,7 @@ def import_questions():
             .splitlines()
         )
 
-        reader = csv.DictReader(
-            content
-        )
-
+        reader = csv.DictReader(content)
 
         required_columns = {
             "category",
@@ -364,19 +425,16 @@ def import_questions():
             "explanation"
         }
 
-
         if not reader.fieldnames:
 
             conn.close()
 
             return "CSV file is empty."
 
-
         missing_columns = (
             required_columns
             - set(reader.fieldnames)
         )
-
 
         if missing_columns:
 
@@ -387,33 +445,28 @@ def import_questions():
                 + ", ".join(missing_columns)
             )
 
-
         for row in reader:
 
             question_text = row[
                 "question"
             ].strip()
 
-
             if not question_text:
                 continue
-
 
             existing = conn.execute("""
                 SELECT id
                 FROM questions
-                WHERE question = ?
+                WHERE LOWER(TRIM(question))
+                    = LOWER(TRIM(?))
             """, (
                 question_text,
             )).fetchone()
 
-
             if existing:
 
                 skipped += 1
-
                 continue
-
 
             conn.execute("""
                 INSERT INTO questions
@@ -445,14 +498,10 @@ def import_questions():
                 row["explanation"].strip()
             ))
 
-
             added += 1
 
-
         conn.commit()
-
         conn.close()
-
 
         return (
             f"Import completed! "
@@ -460,11 +509,9 @@ def import_questions():
             f"{skipped} duplicate questions skipped."
         )
 
-
     except Exception as e:
 
         conn.rollback()
-
         conn.close()
 
         return f"Import failed: {e}"
@@ -477,21 +524,10 @@ def import_questions():
 @main.route("/practice")
 def practice():
 
-    category = request.args.get(
-        "category"
-    )
-
-    subject = request.args.get(
-        "subject"
-    )
-
-    topic = request.args.get(
-        "topic"
-    )
-
-    difficulty = request.args.get(
-        "difficulty"
-    )
+    category = request.args.get("category")
+    subject = request.args.get("subject")
+    topic = request.args.get("topic")
+    difficulty = request.args.get("difficulty")
 
     count = request.args.get(
         "count",
@@ -499,21 +535,14 @@ def practice():
         type=int
     )
 
-
     if count < 1:
-
         count = 5
 
-
     if count > 100:
-
         count = 100
-
 
     conn = get_db_connection()
 
-
-    # Categories
     categories = conn.execute("""
         SELECT DISTINCT category
         FROM questions
@@ -522,8 +551,6 @@ def practice():
         ORDER BY category
     """).fetchall()
 
-
-    # Subjects + category
     subjects = conn.execute("""
         SELECT DISTINCT
             category,
@@ -534,8 +561,6 @@ def practice():
         ORDER BY subject
     """).fetchall()
 
-
-    # Topics + category + subject
     topics = conn.execute("""
         SELECT DISTINCT
             category,
@@ -547,8 +572,6 @@ def practice():
         ORDER BY topic
     """).fetchall()
 
-
-    # Difficulties
     difficulties = conn.execute("""
         SELECT DISTINCT difficulty
         FROM questions
@@ -557,8 +580,6 @@ def practice():
         ORDER BY difficulty
     """).fetchall()
 
-
-    # No filter selected
     if (
         not category
         and not subject
@@ -581,7 +602,6 @@ def practice():
             difficulty=None
         )
 
-
     query = """
         SELECT *
         FROM questions
@@ -590,17 +610,13 @@ def practice():
 
     params = []
 
-
     if category:
 
         query += """
             AND category = ?
         """
 
-        params.append(
-            category
-        )
-
+        params.append(category)
 
     if subject:
 
@@ -608,10 +624,7 @@ def practice():
             AND subject = ?
         """
 
-        params.append(
-            subject
-        )
-
+        params.append(subject)
 
     if topic:
 
@@ -619,10 +632,7 @@ def practice():
             AND topic = ?
         """
 
-        params.append(
-            topic
-        )
-
+        params.append(topic)
 
     if difficulty:
 
@@ -630,29 +640,21 @@ def practice():
             AND difficulty = ?
         """
 
-        params.append(
-            difficulty
-        )
-
+        params.append(difficulty)
 
     query += """
         ORDER BY RANDOM()
         LIMIT ?
     """
 
-    params.append(
-        count
-    )
-
+    params.append(count)
 
     questions = conn.execute(
         query,
         params
     ).fetchall()
 
-
     conn.close()
-
 
     return render_template(
         "practice.html",
@@ -678,24 +680,21 @@ def practice():
 )
 def submit_practice():
 
-    user_id = session.get(
-        "user_id"
-    )
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect("/login")
 
     question_ids = request.form.getlist(
         "question_ids"
     )
 
-
     if not question_ids:
-
         return "No questions were submitted."
-
 
     conn = get_db_connection()
 
     questions = []
-
 
     for question_id in question_ids:
 
@@ -707,16 +706,10 @@ def submit_practice():
             question_id,
         )).fetchone()
 
-
         if question:
-
-            questions.append(
-                question
-            )
-
+            questions.append(question)
 
     score = 0
-
 
     for q in questions:
 
@@ -724,20 +717,12 @@ def submit_practice():
             f"question_{q['id']}"
         )
 
-
-        if user_answer == q[
-            "correct_answer"
-        ]:
-
+        if user_answer == q["correct_answer"]:
             score += 1
 
-
-    total = len(
-        questions
-    )
+    total = len(questions)
 
     wrong = total - score
-
 
     if total > 0:
 
@@ -750,22 +735,15 @@ def submit_practice():
 
         percentage = 0
 
-
     if questions:
 
-        category = questions[0][
-            "category"
-        ]
-
-        subject = questions[0][
-            "subject"
-        ]
+        category = questions[0]["category"]
+        subject = questions[0]["subject"]
 
     else:
 
         category = None
         subject = "Unknown"
-
 
     topics = sorted({
         q["topic"]
@@ -773,11 +751,7 @@ def submit_practice():
         if q["topic"]
     })
 
-
-    topic_text = ", ".join(
-        topics
-    )
-
+    topic_text = ", ".join(topics)
 
     conn.execute("""
         INSERT INTO attempts
@@ -805,11 +779,8 @@ def submit_practice():
         percentage
     ))
 
-
     conn.commit()
-
     conn.close()
-
 
     return render_template(
         "result.html",
@@ -828,20 +799,13 @@ def submit_practice():
 @main.route("/performance")
 def performance():
 
-    user_id = session.get(
-        "user_id"
-    )
-
+    user_id = session.get("user_id")
 
     if not user_id:
-
         return redirect("/login")
-
 
     conn = get_db_connection()
 
-
-    # Practice history
     attempts = conn.execute("""
         SELECT *
         FROM attempts
@@ -851,11 +815,8 @@ def performance():
         user_id,
     )).fetchall()
 
-
-    # Overall summary
     summary = conn.execute("""
         SELECT
-
             COUNT(*) AS total_attempts,
 
             COALESCE(
@@ -885,13 +846,9 @@ def performance():
         user_id,
     )).fetchone()
 
-
-    # Topic performance
     topic_performance = conn.execute("""
         SELECT
-
             subject,
-
             topic,
 
             SUM(total_questions)
@@ -901,11 +858,7 @@ def performance():
                 AS correct_answers,
 
             ROUND(
-                (
-                    SUM(correct_answers)
-                    * 100.0
-                )
-                /
+                SUM(correct_answers) * 100.0 /
                 NULLIF(
                     SUM(total_questions),
                     0
@@ -925,19 +878,14 @@ def performance():
         user_id,
     )).fetchall()
 
-
     conn.close()
 
-
-    # Weak topics
     weak_topics = [
         row
         for row in topic_performance
         if row["percentage"] < 50
     ]
 
-
-    # Improvement topics
     improvement_topics = [
         row
         for row in topic_performance
@@ -947,25 +895,19 @@ def performance():
         )
     ]
 
-
-    # Strong topics
     strong_topics = [
         row
         for row in topic_performance
         if row["percentage"] >= 75
     ]
 
-
-    # Recommendations
     recommendations = []
-
 
     for topic_data in topic_performance:
 
         percentage = topic_data[
             "percentage"
         ]
-
 
         if percentage < 50:
 
@@ -987,7 +929,6 @@ def performance():
                     )
             })
 
-
         elif percentage < 75:
 
             recommendations.append({
@@ -1007,7 +948,6 @@ def performance():
                         "Practice more to improve your score."
                     )
             })
-
 
         else:
 
@@ -1029,13 +969,10 @@ def performance():
                     )
             })
 
-
-    # Placement readiness
     readiness_score = round(
-        summary["average_percentage"],
+        summary["average_percentage"] or 0,
         2
     )
-
 
     if readiness_score < 40:
 
@@ -1071,7 +1008,6 @@ def performance():
             "Excellent preparation. "
             "You are showing strong placement readiness."
         )
-
 
     return render_template(
         "performance.html",

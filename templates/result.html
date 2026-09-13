@@ -1,69 +1,350 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Practice Result - Placement Preparation Analyzer</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Practice Result | PlacementPrepAnalyzer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 
 <body>
 
+
+<!-- =========================================
+     NAVBAR
+========================================= -->
+
+<nav class="navbar">
+
+    <div class="brand">
+        PlacementPrepAnalyzer
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/practice">
+            Practice
+        </a>
+
+        <a href="/performance">
+            Performance
+        </a>
+
+        <a href="/admin">
+            Question Bank
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- =========================================
+     MAIN
+========================================= -->
+
 <div class="container">
 
-    <h1>Practice Result</h1>
+
+    <span class="badge">
+        Practice Completed
+    </span>
+
+
+    <h1>
+        Great Job! 🎉
+    </h1>
+
+
+    <p>
+        Here is your performance summary for
+        this practice test.
+    </p>
+
+
+    <!-- =====================================
+         SCORE
+    ====================================== -->
 
     <div class="result-box">
 
-        <h2>Your Score</h2>
+        <h2>
+            Your Score
+        </h2>
+
+
+        <div class="stat-number">
+
+            {{ score }} / {{ total }}
+
+        </div>
+
 
         <p>
-            <strong>{{ score }}</strong> / {{ total }}
-        </p>
 
-        <p>
-            Percentage: <strong>{{ percentage }}%</strong>
+            Accuracy:
+            <strong>
+                {{ percentage }}%
+            </strong>
+
         </p>
 
     </div>
 
+
+    <!-- =====================================
+         SUMMARY CARDS
+    ====================================== -->
+
+    <div class="dashboard-cards">
+
+
+        <div class="card stat-card">
+
+            <div class="stat-number">
+
+                {{ total }}
+
+            </div>
+
+            <div class="stat-label">
+
+                Total Questions
+
+            </div>
+
+        </div>
+
+
+        <div class="card stat-card">
+
+            <div class="stat-number">
+
+                {{ score }}
+
+            </div>
+
+            <div class="stat-label">
+
+                Correct Answers
+
+            </div>
+
+        </div>
+
+
+        <div class="card stat-card">
+
+            <div class="stat-number">
+
+                {{ wrong }}
+
+            </div>
+
+            <div class="stat-label">
+
+                Wrong Answers
+
+            </div>
+
+        </div>
+
+
+        <div class="card stat-card">
+
+            <div class="stat-number">
+
+                {{ percentage }}%
+
+            </div>
+
+            <div class="stat-label">
+
+                Accuracy
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
     <hr>
 
-    <h2>Question Review</h2>
+
+    <!-- =====================================
+         PERFORMANCE MESSAGE
+    ====================================== -->
+
+    {% if percentage >= 80 %}
+
+        <div class="alert alert-success">
+
+            Excellent performance! Keep practicing
+            consistently to maintain your score.
+
+        </div>
+
+    {% elif percentage >= 60 %}
+
+        <div class="alert alert-warning">
+
+            Good effort! Focus on the questions
+            you missed and improve your accuracy.
+
+        </div>
+
+    {% else %}
+
+        <div class="alert alert-error">
+
+            Keep practicing! Review the explanations
+            below and focus on your weak areas.
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =====================================
+         QUESTION REVIEW
+    ====================================== -->
+
+    <h2>
+        Question Review
+    </h2>
+
+
+    <p>
+        Review your answers and understand the
+        correct concepts.
+    </p>
+
 
     {% for q in questions %}
 
         <div class="question-box">
 
+
+            <span class="badge">
+
+                Question {{ loop.index }}
+
+            </span>
+
+
             <h3>
-                {{ loop.index }}. {{ q["question"] }}
+
+                {{ q["question"] }}
+
             </h3>
 
-            <p>
-                <strong>Correct Answer:</strong>
-                {{ q["correct_answer"] }}
-            </p>
 
             <p>
-                <strong>Explanation:</strong>
-                {{ q["explanation"] }}
+
+                <strong>
+                    Correct Answer:
+                </strong>
+
+                {{ q["correct_answer"] }}
+
             </p>
+
+
+            <p>
+
+                <strong>
+                    Explanation:
+                </strong>
+
+                {{ q["explanation"] }}
+
+            </p>
+
 
         </div>
 
-        <hr>
-
     {% endfor %}
 
-    <br>
 
-    <a href="/practice">
-        <button type="button">Practice Again</button>
-    </a>
+    <hr>
 
-    <a href="/dashboard">
-        <button type="button">Back to Dashboard</button>
-    </a>
+
+    <!-- =====================================
+         NEXT ACTIONS
+    ====================================== -->
+
+    <div class="result-box">
+
+        <h2>
+            Continue Your Preparation 🚀
+        </h2>
+
+
+        <p>
+            Practice another topic or review your
+            overall performance.
+        </p>
+
+
+        <a href="/practice">
+
+            <button type="button">
+                Practice Again
+            </button>
+
+        </a>
+
+
+        <a href="/performance">
+
+            <button type="button">
+                View Performance
+            </button>
+
+        </a>
+
+
+        <a href="/dashboard">
+
+            <button type="button">
+                Back to Dashboard
+            </button>
+
+        </a>
+
+    </div>
+
 
 </div>
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer class="footer">
+
+    PlacementPrepAnalyzer © 2026
+
+</footer>
+
 
 </body>
 </html>

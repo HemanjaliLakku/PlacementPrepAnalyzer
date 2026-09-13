@@ -1,31 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Practice - Placement Preparation Analyzer</title>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Practice | PlacementPrepAnalyzer</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 
 <body>
 
+<nav class="navbar">
+
+    <div class="brand">
+        PlacementPrepAnalyzer
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/dashboard">Dashboard</a>
+        <a href="/practice">Practice</a>
+        <a href="/performance">Performance</a>
+        <a href="/admin">Question Bank</a>
+        <a href="/logout">Logout</a>
+
+    </div>
+
+</nav>
+
+
 <div class="container">
 
-    {% if not questions %}
+    <span class="badge">
+        Placement Practice
+    </span>
 
-        <h1>Placement Practice</h1>
+    <h1>
+        Practice & Improve 🎯
+    </h1>
 
-        <p>Select your preparation area and start practicing.</p>
+    <p>
+        Choose your preparation area and practice
+        questions based on your selected topic and level.
+    </p>
 
 
-        <form method="GET" action="/practice" id="practiceForm">
+    <!-- =========================================
+         PRACTICE FILTERS
+    ========================================== -->
+
+    <div class="ai-section">
+
+        <h2>
+            Choose Your Practice
+        </h2>
+
+        <form method="GET"
+              action="/practice"
+              id="practiceForm">
+
 
             <!-- CATEGORY -->
 
-            <label for="category">Category</label>
-            <br><br>
+            <label for="category">
+                Category
+            </label>
 
-            <select name="category" id="category">
+            <select name="category"
+                    id="category"
+                    required>
 
                 <option value="">
                     Select Category
@@ -33,8 +82,13 @@
 
                 {% for item in categories %}
 
-                    <option value="{{ item['category'] }}">
+                    <option value="{{ item['category'] }}"
+                        {% if category == item['category'] %}
+                            selected
+                        {% endif %}>
+
                         {{ item['category'] }}
+
                     </option>
 
                 {% endfor %}
@@ -47,21 +101,31 @@
 
             <!-- SUBJECT -->
 
-            <label for="subject">Subject</label>
-            <br><br>
+            <label for="subject">
+                Subject
+            </label>
 
-            <select name="subject" id="subject">
+            <select name="subject"
+                    id="subject"
+                    required>
 
                 <option value="">
-                    All Subjects
+                    Select Subject
                 </option>
 
                 {% for item in subjects %}
 
                     <option
                         value="{{ item['subject'] }}"
-                        data-category="{{ item['category'] }}">
+                        data-category="{{ item['category'] }}"
+
+                        {% if subject == item['subject'] %}
+                            selected
+                        {% endif %}
+                    >
+
                         {{ item['subject'] }}
+
                     </option>
 
                 {% endfor %}
@@ -74,13 +138,16 @@
 
             <!-- TOPIC -->
 
-            <label for="topic">Topic</label>
-            <br><br>
+            <label for="topic">
+                Topic
+            </label>
 
-            <select name="topic" id="topic">
+            <select name="topic"
+                    id="topic"
+                    required>
 
                 <option value="">
-                    All Topics
+                    Select Topic
                 </option>
 
                 {% for item in topics %}
@@ -88,8 +155,15 @@
                     <option
                         value="{{ item['topic'] }}"
                         data-category="{{ item['category'] }}"
-                        data-subject="{{ item['subject'] }}">
+                        data-subject="{{ item['subject'] }}"
+
+                        {% if topic == item['topic'] %}
+                            selected
+                        {% endif %}
+                    >
+
                         {{ item['topic'] }}
+
                     </option>
 
                 {% endfor %}
@@ -102,19 +176,27 @@
 
             <!-- DIFFICULTY -->
 
-            <label for="difficulty">Difficulty</label>
-            <br><br>
+            <label for="difficulty">
+                Difficulty
+            </label>
 
-            <select name="difficulty" id="difficulty">
+            <select name="difficulty"
+                    id="difficulty"
+                    required>
 
                 <option value="">
-                    All Levels
+                    Select Difficulty
                 </option>
 
                 {% for item in difficulties %}
 
-                    <option value="{{ item['difficulty'] }}">
+                    <option value="{{ item['difficulty'] }}"
+                        {% if difficulty == item['difficulty'] %}
+                            selected
+                        {% endif %}>
+
                         {{ item['difficulty'] }}
+
                     </option>
 
                 {% endfor %}
@@ -125,113 +207,134 @@
             <br><br>
 
 
-            <!-- NUMBER OF QUESTIONS -->
+            <!-- QUESTION COUNT -->
 
-            <label for="count">Number of Questions</label>
-            <br><br>
+            <label for="count">
+                Number of Questions
+            </label>
 
-            <select name="count" id="count">
+            <select name="count"
+                    id="count">
 
-                <option value="5">5 Questions</option>
-                <option value="10">10 Questions</option>
-                <option value="20">20 Questions</option>
-                <option value="30">30 Questions</option>
-                <option value="50">50 Questions</option>
-                <option value="100">100 Questions</option>
+                <option value="5">
+                    5 Questions
+                </option>
+
+                <option value="10">
+                    10 Questions
+                </option>
+
+                <option value="15">
+                    15 Questions
+                </option>
+
+                <option value="20">
+                    20 Questions
+                </option>
 
             </select>
 
 
             <br><br>
 
+
             <button type="submit">
-                Start Practice
+                Start Practice →
+            </button>
+
+            <button type="button"
+                    id="resetFilters">
+
+                Reset Filters
+
             </button>
 
         </form>
 
+    </div>
+
+
+    {% if questions %}
 
         <hr>
 
-        <p>
-            Questions are selected randomly from the question bank.
-        </p>
 
+        <!-- =====================================
+             TEST HEADER
+        ====================================== -->
 
-    {% else %}
+        <div class="card">
 
+            <span class="badge">
+                Practice Test
+            </span>
 
-        <!-- PRACTICE TEST -->
+            <h2>
+                Your Questions
+            </h2>
 
-        <h1>Practice Test</h1>
-
-        {% if category %}
             <p>
-                <strong>Category:</strong>
-                {{ category }}
+                Answer all questions and submit the test
+                to view your performance.
             </p>
-        {% endif %}
 
-        {% if subject %}
-            <p>
-                <strong>Subject:</strong>
-                {{ subject }}
-            </p>
-        {% endif %}
-
-        {% if topic %}
-            <p>
-                <strong>Topic:</strong>
-                {{ topic }}
-            </p>
-        {% endif %}
-
-        {% if difficulty %}
-            <p>
-                <strong>Difficulty:</strong>
-                {{ difficulty }}
-            </p>
-        {% endif %}
+        </div>
 
 
-        <p>
-            <strong>Total Questions:</strong>
-            {{ questions|length }}
-        </p>
-
-
-        <hr>
-
+        <!-- =====================================
+             QUESTIONS
+        ====================================== -->
 
         <form method="POST"
-              action="/submit-practice">
+              action="/submit-practice"
+              id="testForm">
 
 
             {% for q in questions %}
 
-                <input type="hidden"
-                       name="question_ids"
-                       value="{{ q['id'] }}">
-
-
                 <div class="question-box">
 
+                    <span class="badge">
+
+                        Question {{ loop.index }}
+
+                    </span>
+
+
                     <h3>
-                        {{ loop.index }}.
-                        {{ q["question"] }}
+
+                        {{ q['question'] }}
+
                     </h3>
 
+
                     <p>
-                        <strong>Subject:</strong>
-                        {{ q["subject"] }}
-                        |
-                        <strong>Topic:</strong>
-                        {{ q["topic"] }}
-                        |
-                        <strong>Difficulty:</strong>
-                        {{ q["difficulty"] }}
+
+                        <strong>
+                            {{ q['subject'] }}
+                        </strong>
+
+                        <span>
+                            ·
+                        </span>
+
+                        {{ q['topic'] }}
+
+                        <span>
+                            ·
+                        </span>
+
+                        {{ q['difficulty'] }}
+
                     </p>
 
+
+                    <input type="hidden"
+                           name="question_ids"
+                           value="{{ q['id'] }}">
+
+
+                    <!-- OPTION A -->
 
                     <label>
 
@@ -240,10 +343,16 @@
                                value="A"
                                required>
 
-                        A. {{ q["option_a"] }}
+                        <strong>
+                            A.
+                        </strong>
+
+                        {{ q['option_a'] }}
 
                     </label>
 
+
+                    <!-- OPTION B -->
 
                     <label>
 
@@ -251,10 +360,16 @@
                                name="question_{{ q['id'] }}"
                                value="B">
 
-                        B. {{ q["option_b"] }}
+                        <strong>
+                            B.
+                        </strong>
+
+                        {{ q['option_b'] }}
 
                     </label>
 
+
+                    <!-- OPTION C -->
 
                     <label>
 
@@ -262,10 +377,16 @@
                                name="question_{{ q['id'] }}"
                                value="C">
 
-                        C. {{ q["option_c"] }}
+                        <strong>
+                            C.
+                        </strong>
+
+                        {{ q['option_c'] }}
 
                     </label>
 
+
+                    <!-- OPTION D -->
 
                     <label>
 
@@ -273,7 +394,11 @@
                                name="question_{{ q['id'] }}"
                                value="D">
 
-                        D. {{ q["option_d"] }}
+                        <strong>
+                            D.
+                        </strong>
+
+                        {{ q['option_d'] }}
 
                     </label>
 
@@ -282,149 +407,351 @@
             {% endfor %}
 
 
-            <button type="submit">
-                Submit Practice
-            </button>
+            <!-- =====================================
+                 SUBMIT
+            ====================================== -->
+
+            <div class="result-box">
+
+                <h2>
+                    Ready to Submit?
+                </h2>
+
+                <p>
+                    Make sure you have answered all
+                    questions before submitting.
+                </p>
+
+                <button type="submit">
+                    Submit Practice Test
+                </button>
+
+            </div>
 
         </form>
 
+
+    {% elif category or subject or topic or difficulty %}
+
+        <!-- =====================================
+             NO QUESTIONS
+        ====================================== -->
+
+        <div class="result-box">
+
+            <h2>
+                No Questions Found 😕
+            </h2>
+
+            <p>
+                There are no questions available for
+                this selected combination.
+            </p>
+
+            <a href="/practice">
+
+                <button type="button">
+                    Try Another Selection
+                </button>
+
+            </a>
+
+        </div>
+
+
+    {% else %}
+
+        <!-- =====================================
+             HOW IT WORKS
+        ====================================== -->
+
+        <div class="card">
+
+            <h2>
+                How It Works
+            </h2>
+
+
+            <div class="category-grid">
+
+
+                <div class="category-card">
+
+                    <div class="stat-number">
+                        01
+                    </div>
+
+                    <h3>
+                        Choose
+                    </h3>
+
+                    <p>
+                        Select category, subject,
+                        topic and difficulty.
+                    </p>
+
+                </div>
+
+
+                <div class="category-card">
+
+                    <div class="stat-number">
+                        02
+                    </div>
+
+                    <h3>
+                        Practice
+                    </h3>
+
+                    <p>
+                        Attempt randomly selected
+                        placement questions.
+                    </p>
+
+                </div>
+
+
+                <div class="category-card">
+
+                    <div class="stat-number">
+                        03
+                    </div>
+
+                    <h3>
+                        Analyze
+                    </h3>
+
+                    <p>
+                        Review your score and identify
+                        areas that need improvement.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
     {% endif %}
+
 
 </div>
 
 
-<!-- =====================================================
-     DYNAMIC FILTER SCRIPT
-===================================================== -->
+<footer class="footer">
+
+    PlacementPrepAnalyzer © 2026
+
+</footer>
+
 
 <script>
 
-    const categorySelect =
-        document.getElementById("category");
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    const subjectSelect =
-        document.getElementById("subject");
+        const category =
+            document.getElementById("category");
 
-    const topicSelect =
-        document.getElementById("topic");
+        const subject =
+            document.getElementById("subject");
 
+        const topic =
+            document.getElementById("topic");
 
-    function updateSubjects() {
-
-        if (!categorySelect || !subjectSelect) {
-            return;
-        }
-
-        const selectedCategory =
-            categorySelect.value;
+        const resetButton =
+            document.getElementById("resetFilters");
 
 
-        const subjectOptions =
-            subjectSelect.querySelectorAll("option[data-category]");
+        function filterSubjects() {
+
+            const selectedCategory =
+                category.value;
+
+            const currentSubject =
+                subject.value;
+
+            subject.value = "";
 
 
-        subjectOptions.forEach(function(option) {
+            Array.from(
+                subject.options
+            ).forEach(function (option) {
 
-            if (
-                selectedCategory === "" ||
-                option.dataset.category === selectedCategory
-            ) {
+                if (!option.dataset.category) {
 
-                option.style.display = "block";
+                    option.hidden = false;
 
-            } else {
+                    return;
 
-                option.style.display = "none";
+                }
 
-            }
+                if (
+                    !selectedCategory
+                    ||
+                    option.dataset.category
+                    === selectedCategory
+                ) {
 
-        });
+                    option.hidden = false;
 
+                } else {
 
-        subjectSelect.value = "";
+                    option.hidden = true;
 
+                }
 
-        if (topicSelect) {
-
-            topicSelect.value = "";
-
-            updateTopics();
-
-        }
-    }
-
-
-    function updateTopics() {
-
-        if (!categorySelect || !subjectSelect || !topicSelect) {
-            return;
-        }
+            });
 
 
-        const selectedCategory =
-            categorySelect.value;
+            const selectedOption =
+                Array.from(
+                    subject.options
+                ).find(function (option) {
 
-        const selectedSubject =
-            subjectSelect.value;
+                    return (
+                        option.value === currentSubject
+                        &&
+                        !option.hidden
+                    );
 
-
-        const topicOptions =
-            topicSelect.querySelectorAll("option[data-category]");
-
-
-        topicOptions.forEach(function(option) {
-
-            const matchesCategory =
-                selectedCategory === "" ||
-                option.dataset.category === selectedCategory;
+                });
 
 
-            const matchesSubject =
-                selectedSubject === "" ||
-                option.dataset.subject === selectedSubject;
+            if (selectedOption) {
 
-
-            if (
-                matchesCategory &&
-                matchesSubject
-            ) {
-
-                option.style.display = "block";
-
-            } else {
-
-                option.style.display = "none";
+                selectedOption.selected = true;
 
             }
 
-        });
+        }
 
 
-        topicSelect.value = "";
+        function filterTopics() {
 
-    }
+            const selectedCategory =
+                category.value;
+
+            const selectedSubject =
+                subject.value;
+
+            const currentTopic =
+                topic.value;
+
+            topic.value = "";
 
 
-    if (categorySelect) {
+            Array.from(
+                topic.options
+            ).forEach(function (option) {
 
-        categorySelect.addEventListener(
+                if (!option.dataset.category) {
+
+                    option.hidden = false;
+
+                    return;
+
+                }
+
+
+                const categoryMatch =
+                    !selectedCategory
+                    ||
+                    option.dataset.category
+                    === selectedCategory;
+
+
+                const subjectMatch =
+                    !selectedSubject
+                    ||
+                    option.dataset.subject
+                    === selectedSubject;
+
+
+                if (
+                    categoryMatch
+                    &&
+                    subjectMatch
+                ) {
+
+                    option.hidden = false;
+
+                } else {
+
+                    option.hidden = true;
+
+                }
+
+            });
+
+
+            const selectedOption =
+                Array.from(
+                    topic.options
+                ).find(function (option) {
+
+                    return (
+                        option.value === currentTopic
+                        &&
+                        !option.hidden
+                    );
+
+                });
+
+
+            if (selectedOption) {
+
+                selectedOption.selected = true;
+
+            }
+
+        }
+
+
+        category.addEventListener(
             "change",
-            updateSubjects
+            function () {
+
+                filterSubjects();
+
+                filterTopics();
+
+            }
         );
 
-    }
 
-
-    if (subjectSelect) {
-
-        subjectSelect.addEventListener(
+        subject.addEventListener(
             "change",
-            updateTopics
+            function () {
+
+                filterTopics();
+
+            }
         );
 
+
+        resetButton.addEventListener(
+            "click",
+            function () {
+
+                window.location.href =
+                    "/practice";
+
+            }
+        );
+
+
+        filterSubjects();
+
+        filterTopics();
+
     }
+);
 
 </script>
+
 
 </body>
 </html>
