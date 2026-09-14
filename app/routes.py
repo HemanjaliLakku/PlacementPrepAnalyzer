@@ -133,10 +133,14 @@ def dashboard():
     stats = conn.execute("""
         SELECT
             COUNT(*) AS tests_taken,
-            COALESCE(SUM(total_questions), 0) AS questions_practiced,
-            COALESCE(SUM(correct_answers), 0) AS correct_answers,
-            COALESCE(SUM(wrong_answers), 0) AS wrong_answers,
-            COALESCE(AVG(percentage), 0) AS average_accuracy
+            COALESCE(SUM(total_questions), 0)
+                AS questions_practiced,
+            COALESCE(SUM(correct_answers), 0)
+                AS correct_answers,
+            COALESCE(SUM(wrong_answers), 0)
+                AS wrong_answers,
+            COALESCE(AVG(percentage), 0)
+                AS average_accuracy
         FROM attempts
         WHERE user_id = ?
     """, (user_id,)).fetchone()
@@ -195,6 +199,456 @@ def dashboard():
 
 
 # ==================================================
+# COMPANY PREPARATION DATA
+# ==================================================
+
+COMPANY_PREPARATION = {
+
+    "tcs": {
+        "name": "TCS",
+        "areas": [
+            {
+                "title": "Quantitative Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative aptitude and numerical problem solving.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice logical and analytical reasoning.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals and technical questions.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "infosys": {
+        "name": "Infosys",
+        "areas": [
+            {
+                "title": "Quantitative Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice numerical and quantitative problem solving.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice logical and analytical reasoning.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming concepts and fundamentals.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "accenture": {
+        "name": "Accenture",
+        "areas": [
+            {
+                "title": "Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative placement questions.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice analytical reasoning and problem solving.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Improve programming fundamentals.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "wipro": {
+        "name": "Wipro",
+        "areas": [
+            {
+                "title": "Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative aptitude.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice reasoning questions.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming and technical fundamentals.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "cognizant": {
+        "name": "Cognizant",
+        "areas": [
+            {
+                "title": "Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative problem solving.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice logical reasoning.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "capgemini": {
+        "name": "Capgemini",
+        "areas": [
+            {
+                "title": "Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative aptitude.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice logical and analytical skills.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming concepts.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "hcltech": {
+        "name": "HCLTech",
+        "areas": [
+            {
+                "title": "Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative aptitude.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice logical reasoning.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "tech-mahindra": {
+        "name": "Tech Mahindra",
+        "areas": [
+            {
+                "title": "Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative aptitude.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice reasoning.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "ltimindtree": {
+        "name": "LTIMindtree",
+        "areas": [
+            {
+                "title": "Aptitude",
+                "category": "Aptitude",
+                "subject": "Quantitative Aptitude",
+                "description": "Practice quantitative aptitude.",
+                "link": "/practice?category=Aptitude&subject=Quantitative%20Aptitude"
+            },
+            {
+                "title": "Reasoning",
+                "category": "Reasoning",
+                "subject": "Logical Reasoning",
+                "description": "Practice reasoning.",
+                "link": "/practice?category=Reasoning&subject=Logical%20Reasoning"
+            },
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            }
+        ]
+    },
+
+    "amazon": {
+        "name": "Amazon",
+        "areas": [
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            },
+            {
+                "title": "Data Structures",
+                "category": "Data Structures",
+                "subject": "",
+                "description": "Practice data structures and algorithms.",
+                "link": "/practice?category=Data%20Structures"
+            },
+            {
+                "title": "Database",
+                "category": "Database",
+                "subject": "",
+                "description": "Practice SQL and database concepts.",
+                "link": "/practice?category=Database"
+            }
+        ]
+    },
+
+    "microsoft": {
+        "name": "Microsoft",
+        "areas": [
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            },
+            {
+                "title": "Data Structures",
+                "category": "Data Structures",
+                "subject": "",
+                "description": "Practice algorithms and data structures.",
+                "link": "/practice?category=Data%20Structures"
+            },
+            {
+                "title": "Core CS",
+                "category": "Core CS",
+                "subject": "",
+                "description": "Practice core computer science concepts.",
+                "link": "/practice?category=Core%20CS"
+            }
+        ]
+    },
+
+    "google": {
+        "name": "Google",
+        "areas": [
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            },
+            {
+                "title": "Data Structures",
+                "category": "Data Structures",
+                "subject": "",
+                "description": "Practice data structures and algorithms.",
+                "link": "/practice?category=Data%20Structures"
+            },
+            {
+                "title": "Core CS",
+                "category": "Core CS",
+                "subject": "",
+                "description": "Practice computer science fundamentals.",
+                "link": "/practice?category=Core%20CS"
+            }
+        ]
+    },
+
+    "adobe": {
+        "name": "Adobe",
+        "areas": [
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming concepts.",
+                "link": "/practice?category=Programming"
+            },
+            {
+                "title": "Data Structures",
+                "category": "Data Structures",
+                "subject": "",
+                "description": "Practice algorithms and data structures.",
+                "link": "/practice?category=Data%20Structures"
+            },
+            {
+                "title": "Database",
+                "category": "Database",
+                "subject": "",
+                "description": "Practice database concepts.",
+                "link": "/practice?category=Database"
+            }
+        ]
+    },
+
+    "zoho": {
+        "name": "Zoho",
+        "areas": [
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Practice programming fundamentals.",
+                "link": "/practice?category=Programming"
+            },
+            {
+                "title": "Data Structures",
+                "category": "Data Structures",
+                "subject": "",
+                "description": "Practice DSA and problem solving.",
+                "link": "/practice?category=Data%20Structures"
+            },
+            {
+                "title": "Database",
+                "category": "Database",
+                "subject": "",
+                "description": "Practice SQL and database fundamentals.",
+                "link": "/practice?category=Database"
+            }
+        ]
+    },
+
+    "product-gcc": {
+        "name": "Product / GCC Companies",
+        "areas": [
+            {
+                "title": "Programming",
+                "category": "Programming",
+                "subject": "",
+                "description": "Build strong programming fundamentals.",
+                "link": "/practice?category=Programming"
+            },
+            {
+                "title": "Data Structures",
+                "category": "Data Structures",
+                "subject": "",
+                "description": "Practice algorithms and data structures.",
+                "link": "/practice?category=Data%20Structures"
+            },
+            {
+                "title": "Core CS",
+                "category": "Core CS",
+                "subject": "",
+                "description": "Strengthen core computer science concepts.",
+                "link": "/practice?category=Core%20CS"
+            }
+        ]
+    }
+}
+
+
+# ==================================================
+# COMPANIES
+# ==================================================
+
+@main.route("/companies")
+def companies():
+
+    if not session.get("user_id"):
+        return redirect("/login")
+
+    return render_template(
+        "company.html"
+    )
+
+
+@main.route("/company/<company_name>")
+def company_preparation(company_name):
+
+    if not session.get("user_id"):
+        return redirect("/login")
+
+    company_key = company_name.lower()
+
+    company_data = COMPANY_PREPARATION.get(
+        company_key
+    )
+
+    if not company_data:
+        return redirect("/companies")
+
+    return render_template(
+        "company_detail.html",
+        company_name=company_data["name"],
+        preparation_areas=company_data["areas"]
+    )
+
+
+# ==================================================
 # ADMIN - ADD / VIEW QUESTIONS
 # ==================================================
 
@@ -205,17 +659,41 @@ def admin():
 
     if request.method == "POST":
 
-        category = request.form["category"].strip()
-        subject = request.form["subject"].strip()
-        topic = request.form["topic"].strip()
-        difficulty = request.form["difficulty"].strip()
+        category = request.form[
+            "category"
+        ].strip()
 
-        question = request.form["question"].strip()
+        subject = request.form[
+            "subject"
+        ].strip()
 
-        option_a = request.form["option_a"].strip()
-        option_b = request.form["option_b"].strip()
-        option_c = request.form["option_c"].strip()
-        option_d = request.form["option_d"].strip()
+        topic = request.form[
+            "topic"
+        ].strip()
+
+        difficulty = request.form[
+            "difficulty"
+        ].strip()
+
+        question = request.form[
+            "question"
+        ].strip()
+
+        option_a = request.form[
+            "option_a"
+        ].strip()
+
+        option_b = request.form[
+            "option_b"
+        ].strip()
+
+        option_c = request.form[
+            "option_c"
+        ].strip()
+
+        option_d = request.form[
+            "option_d"
+        ].strip()
 
         correct_answer = request.form[
             "correct_answer"
@@ -278,7 +756,9 @@ def admin():
 
             conn.close()
 
-            return f"Question could not be added: {e}"
+            return (
+                f"Question could not be added: {e}"
+            )
 
         conn.close()
 
@@ -409,7 +889,9 @@ def import_questions():
             .splitlines()
         )
 
-        reader = csv.DictReader(content)
+        reader = csv.DictReader(
+            content
+        )
 
         required_columns = {
             "category",
@@ -466,6 +948,7 @@ def import_questions():
             if existing:
 
                 skipped += 1
+
                 continue
 
             conn.execute("""
@@ -501,6 +984,7 @@ def import_questions():
             added += 1
 
         conn.commit()
+
         conn.close()
 
         return (
@@ -524,10 +1008,21 @@ def import_questions():
 @main.route("/practice")
 def practice():
 
-    category = request.args.get("category")
-    subject = request.args.get("subject")
-    topic = request.args.get("topic")
-    difficulty = request.args.get("difficulty")
+    category = request.args.get(
+        "category"
+    )
+
+    subject = request.args.get(
+        "subject"
+    )
+
+    topic = request.args.get(
+        "topic"
+    )
+
+    difficulty = request.args.get(
+        "difficulty"
+    )
 
     count = request.args.get(
         "count",
@@ -680,7 +1175,9 @@ def practice():
 )
 def submit_practice():
 
-    user_id = session.get("user_id")
+    user_id = session.get(
+        "user_id"
+    )
 
     if not user_id:
         return redirect("/login")
@@ -717,10 +1214,15 @@ def submit_practice():
             f"question_{q['id']}"
         )
 
-        if user_answer == q["correct_answer"]:
+        if user_answer == q[
+            "correct_answer"
+        ]:
+
             score += 1
 
-    total = len(questions)
+    total = len(
+        questions
+    )
 
     wrong = total - score
 
@@ -737,8 +1239,13 @@ def submit_practice():
 
     if questions:
 
-        category = questions[0]["category"]
-        subject = questions[0]["subject"]
+        category = questions[0][
+            "category"
+        ]
+
+        subject = questions[0][
+            "subject"
+        ]
 
     else:
 
@@ -751,7 +1258,9 @@ def submit_practice():
         if q["topic"]
     })
 
-    topic_text = ", ".join(topics)
+    topic_text = ", ".join(
+        topics
+    )
 
     conn.execute("""
         INSERT INTO attempts
@@ -799,7 +1308,9 @@ def submit_practice():
 @main.route("/performance")
 def performance():
 
-    user_id = session.get("user_id")
+    user_id = session.get(
+        "user_id"
+    )
 
     if not user_id:
         return redirect("/login")
@@ -817,38 +1328,47 @@ def performance():
 
     summary = conn.execute("""
         SELECT
-            COUNT(*) AS total_attempts,
+
+            COUNT(*)
+                AS total_attempts,
 
             COALESCE(
                 SUM(total_questions),
                 0
-            ) AS total_questions,
+            )
+                AS total_questions,
 
             COALESCE(
                 SUM(correct_answers),
                 0
-            ) AS total_correct,
+            )
+                AS total_correct,
 
             COALESCE(
                 SUM(wrong_answers),
                 0
-            ) AS total_wrong,
+            )
+                AS total_wrong,
 
             COALESCE(
                 AVG(percentage),
                 0
-            ) AS average_percentage
+            )
+                AS average_percentage
 
         FROM attempts
 
         WHERE user_id = ?
+
     """, (
         user_id,
     )).fetchone()
 
     topic_performance = conn.execute("""
         SELECT
+
             subject,
+
             topic,
 
             SUM(total_questions)
@@ -965,7 +1485,8 @@ def performance():
                 "message":
                     (
                         "Strong topic. "
-                        "Keep practicing to maintain your performance."
+                        "Keep practicing to maintain "
+                        "your performance."
                     )
             })
 
@@ -1011,13 +1532,29 @@ def performance():
 
     return render_template(
         "performance.html",
+
         attempts=attempts,
+
         summary=summary,
-        topic_performance=topic_performance,
-        weak_topics=weak_topics,
-        improvement_topics=improvement_topics,
-        strong_topics=strong_topics,
-        recommendations=recommendations,
-        readiness_score=readiness_score,
-        readiness_message=readiness_message
+
+        topic_performance=
+            topic_performance,
+
+        weak_topics=
+            weak_topics,
+
+        improvement_topics=
+            improvement_topics,
+
+        strong_topics=
+            strong_topics,
+
+        recommendations=
+            recommendations,
+
+        readiness_score=
+            readiness_score,
+
+        readiness_message=
+            readiness_message
     )

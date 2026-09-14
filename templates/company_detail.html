@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ company_name }} Preparation | PlacementPrepAnalyzer
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="brand">
+        PlacementPrepAnalyzer
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/practice">
+            Practice
+        </a>
+
+        <a href="/companies">
+            Companies
+        </a>
+
+        <a href="/performance">
+            Performance
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="container">
+
+    <span class="badge">
+        Company Preparation
+    </span>
+
+
+    <h1>
+        {{ company_name }} Preparation 🚀
+    </h1>
+
+
+    <p>
+        Prepare systematically for your target company
+        with relevant practice areas, mock tests and
+        performance analysis.
+    </p>
+
+
+    <hr>
+
+
+    <h2>
+        Preparation Areas
+    </h2>
+
+
+    <div class="category-grid">
+
+
+        <div class="category-card">
+
+            <h3>
+                🧮 Aptitude
+            </h3>
+
+            <p>
+                Quantitative aptitude, arithmetic,
+                data interpretation and problem solving.
+            </p>
+
+            <a href="/practice">
+                Practice Aptitude →
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <h3>
+                🧠 Reasoning
+            </h3>
+
+            <p>
+                Logical reasoning, analytical reasoning,
+                series, puzzles and problem solving.
+            </p>
+
+            <a href="/practice">
+                Practice Reasoning →
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <h3>
+                📚 Verbal Ability
+            </h3>
+
+            <p>
+                Grammar, vocabulary, sentence correction,
+                reading comprehension and verbal reasoning.
+            </p>
+
+            <a href="/practice">
+                Practice Verbal →
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <h3>
+                💻 Programming
+            </h3>
+
+            <p>
+                Programming fundamentals, output questions,
+                debugging and language-specific concepts.
+            </p>
+
+            <a href="/practice">
+                Practice Programming →
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <h3>
+                📊 DSA
+            </h3>
+
+            <p>
+                Arrays, strings, linked lists, stacks,
+                queues, trees, graphs and algorithms.
+            </p>
+
+            <a href="/practice">
+                Practice DSA →
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <h3>
+                🗄️ SQL & DBMS
+            </h3>
+
+            <p>
+                SQL queries, joins, subqueries,
+                normalization and database concepts.
+            </p>
+
+            <a href="/practice">
+                Practice SQL & DBMS →
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <h3>
+                ⚙️ Core CS
+            </h3>
+
+            <p>
+                Operating Systems, Computer Networks,
+                OOP and core computer science concepts.
+            </p>
+
+            <a href="/practice">
+                Practice Core CS →
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <h3>
+                👨‍💻 Coding Practice
+            </h3>
+
+            <p>
+                Solve coding problems and improve
+                your programming problem-solving skills.
+            </p>
+
+            <a href="/practice">
+                Start Coding →
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <h2>
+        Company Preparation Tests
+    </h2>
+
+
+    <div class="dashboard-cards">
+
+
+        <div class="card">
+
+            <span class="badge">
+                Assessment
+            </span>
+
+            <h3>
+                Aptitude Test
+            </h3>
+
+            <p>
+                Practice a focused quantitative,
+                reasoning and verbal assessment.
+            </p>
+
+            <a href="/practice">
+
+                <button type="button">
+                    Start Test
+                </button>
+
+            </a>
+
+        </div>
+
+
+        <div class="card">
+
+            <span class="badge">
+                Assessment
+            </span>
+
+            <h3>
+                Technical Test
+            </h3>
+
+            <p>
+                Test your programming, DSA, SQL
+                and core CS knowledge.
+            </p>
+
+            <a href="/practice">
+
+                <button type="button">
+                    Start Test
+                </button>
+
+            </a>
+
+        </div>
+
+
+        <div class="card">
+
+            <span class="badge">
+                Assessment
+            </span>
+
+            <h3>
+                Full Placement Test
+            </h3>
+
+            <p>
+                Attempt a complete placement-style
+                test covering multiple preparation areas.
+            </p>
+
+            <a href="/practice">
+
+                <button type="button">
+                    Start Test
+                </button>
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <div class="result-box">
+
+        <span class="badge">
+            Your Goal
+        </span>
+
+        <h2>
+            Prepare → Practice → Analyze → Improve
+        </h2>
+
+        <p>
+            Start with the fundamentals, practice
+            consistently, review your performance and
+            focus more on your weaker areas.
+        </p>
+
+
+        <a href="/practice">
+
+            <button type="button">
+                Start Practice
+            </button>
+
+        </a>
+
+
+        <a href="/performance">
+
+            <button type="button">
+                View Performance
+            </button>
+
+        </a>
+
+    </div>
+
+
+    <hr>
+
+
+    <div class="card">
+
+        <h2>
+            Important
+        </h2>
+
+        <p>
+            Company hiring processes, eligibility,
+            assessment sections and selection criteria
+            can change over time. Always verify the latest
+            details from the official company recruitment
+            notification.
+        </p>
+
+    </div>
+
+
+    <br>
+
+
+    <a href="/companies">
+
+        <button type="button">
+            ← Back to Companies
+        </button>
+
+    </a>
+
+
+</div>
+
+
+<footer class="footer">
+
+    PlacementPrepAnalyzer © 2026
+
+</footer>
+
+
+</body>
+</html>
