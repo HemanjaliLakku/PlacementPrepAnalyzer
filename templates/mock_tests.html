@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Mock Tests | PlacementPrepAnalyzer
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="brand">
+        PlacementPrepAnalyzer
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/practice">
+            Practice
+        </a>
+
+        <a href="/mock-tests">
+            Mock Tests
+        </a>
+
+        <a href="/companies">
+            Companies
+        </a>
+
+        <a href="/performance">
+            Performance
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="container">
+
+    <span class="badge">
+        Placement Mock Tests
+    </span>
+
+    <h1>
+        Test Your Placement Readiness 📝
+    </h1>
+
+    <p>
+        Practice under test conditions and identify
+        the areas that need more preparation.
+    </p>
+
+
+    <hr>
+
+
+    <h2>
+        Available Mock Tests
+    </h2>
+
+
+    <div class="category-grid">
+
+
+        <div class="category-card">
+
+            <span class="badge">
+                Aptitude
+            </span>
+
+            <h3>
+                Aptitude Mock Test
+            </h3>
+
+            <p>
+                Quantitative aptitude and numerical
+                problem-solving practice.
+            </p>
+
+            <a href="/mock-test/aptitude">
+
+                <button type="button">
+                    Start Test →
+                </button>
+
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <span class="badge">
+                Reasoning
+            </span>
+
+            <h3>
+                Reasoning Mock Test
+            </h3>
+
+            <p>
+                Logical reasoning, analytical thinking,
+                series and problem solving.
+            </p>
+
+            <a href="/mock-test/reasoning">
+
+                <button type="button">
+                    Start Test →
+                </button>
+
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <span class="badge">
+                Technical
+            </span>
+
+            <h3>
+                Technical Mock Test
+            </h3>
+
+            <p>
+                Programming, DSA, SQL, DBMS and
+                core computer science questions.
+            </p>
+
+            <a href="/mock-test/technical">
+
+                <button type="button">
+                    Start Test →
+                </button>
+
+            </a>
+
+        </div>
+
+
+        <div class="category-card">
+
+            <span class="badge">
+                Full Placement
+            </span>
+
+            <h3>
+                Full Placement Mock
+            </h3>
+
+            <p>
+                Mixed aptitude, reasoning, verbal and
+                technical placement preparation.
+            </p>
+
+            <a href="/mock-test/full">
+
+                <button type="button">
+                    Start Full Test →
+                </button>
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <div class="result-box">
+
+        <span class="badge">
+            Preparation Strategy
+        </span>
+
+        <h2>
+            Practice → Test → Analyze → Improve
+        </h2>
+
+        <p>
+            Use topic practice to strengthen weak areas,
+            then take mock tests to measure your overall
+            placement preparation.
+        </p>
+
+        <a href="/practice">
+
+            <button type="button">
+                Practice Topics
+            </button>
+
+        </a>
+
+        <a href="/performance">
+
+            <button type="button">
+                View Performance
+            </button>
+
+        </a>
+
+    </div>
+
+
+    <hr>
+
+
+    <div class="card">
+
+        <h2>
+            Mock Test Guidelines
+        </h2>
+
+        <p>
+            Try to complete each test without checking
+            answers during the test. Review your mistakes
+            after submission and focus on weaker topics.
+        </p>
+
+    </div>
+
+
+    <br>
+
+
+    <a href="/dashboard">
+
+        <button type="button">
+            ← Back to Dashboard
+        </button>
+
+    </a>
+
+</div>
+
+
+<footer class="footer">
+
+    PlacementPrepAnalyzer © 2026
+
+</footer>
+
+</body>
+</html>

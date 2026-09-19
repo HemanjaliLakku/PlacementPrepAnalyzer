@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ title }} | PlacementPrepAnalyzer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="brand">
+        PlacementPrepAnalyzer
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/practice">
+            Practice
+        </a>
+
+        <a href="/mock-tests">
+            Mock Tests
+        </a>
+
+        <a href="/companies">
+            Companies
+        </a>
+
+        <a href="/performance">
+            Performance
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="container">
+
+    <span class="badge">
+        Mock Assessment
+    </span>
+
+    <h1>
+        {{ title }}
+    </h1>
+
+    <p>
+        Answer all questions and submit the test
+        when you are ready.
+    </p>
+
+
+    <div class="result-box">
+
+        <h3>
+            Time Remaining
+        </h3>
+
+        <div id="timer"
+             style="font-size: 32px;
+                    font-weight: 800;
+                    color: #4f46e5;">
+            15:00
+        </div>
+
+        <p>
+            The test will auto-submit when the timer ends.
+        </p>
+
+    </div>
+
+
+    <hr>
+
+
+    <form method="POST"
+          action="/submit-mock-test"
+          id="mockTestForm">
+
+
+        <input type="hidden"
+               name="test_type"
+               value="{{ test_type }}">
+
+
+        {% for q in questions %}
+
+        <div class="question-box">
+
+            <span class="badge">
+                Question {{ loop.index }}
+                of
+                {{ questions|length }}
+            </span>
+
+
+            <h3>
+                {{ q["question"] }}
+            </h3>
+
+
+            <p>
+
+                <strong>
+                    {{ q["subject"] }}
+                </strong>
+
+                ·
+
+                {{ q["topic"] }}
+
+                ·
+
+                {{ q["difficulty"] }}
+
+            </p>
+
+
+            <input type="hidden"
+                   name="question_ids"
+                   value="{{ q['id'] }}">
+
+
+            <label>
+
+                <input type="radio"
+                       name="question_{{ q['id'] }}"
+                       value="A"
+                       required>
+
+                <strong>A.</strong>
+
+                {{ q["option_a"] }}
+
+            </label>
+
+
+            <label>
+
+                <input type="radio"
+                       name="question_{{ q['id'] }}"
+                       value="B">
+
+                <strong>B.</strong>
+
+                {{ q["option_b"] }}
+
+            </label>
+
+
+            <label>
+
+                <input type="radio"
+                       name="question_{{ q['id'] }}"
+                       value="C">
+
+                <strong>C.</strong>
+
+                {{ q["option_c"] }}
+
+            </label>
+
+
+            <label>
+
+                <input type="radio"
+                       name="question_{{ q['id'] }}"
+                       value="D">
+
+                <strong>D.</strong>
+
+                {{ q["option_d"] }}
+
+            </label>
+
+        </div>
+
+        {% endfor %}
+
+
+        <div class="result-box">
+
+            <h2>
+                Submit Test?
+            </h2>
+
+            <p>
+                Make sure you have answered every question.
+            </p>
+
+            <button type="submit">
+                Submit Mock Test
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<footer class="footer">
+
+    PlacementPrepAnalyzer © 2026
+
+</footer>
+
+
+<script>
+
+let totalSeconds = 15 * 60;
+
+const timerElement =
+    document.getElementById("timer");
+
+const form =
+    document.getElementById("mockTestForm");
+
+
+function updateTimer() {
+
+    const minutes =
+        Math.floor(totalSeconds / 60);
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    timerElement.textContent =
+        String(minutes).padStart(2, "0")
+        + ":"
+        + String(seconds).padStart(2, "0");
+
+
+    if (totalSeconds <= 0) {
+
+        form.submit();
+
+        return;
+    }
+
+
+    totalSeconds--;
+
+}
+
+
+updateTimer();
+
+setInterval(
+    updateTimer,
+    1000
+);
+
+</script>
+
+
+</body>
+
+</html>

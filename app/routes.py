@@ -149,8 +149,10 @@ def dashboard():
         SELECT
             subject,
             topic,
-            SUM(total_questions) AS total_questions,
-            SUM(correct_answers) AS correct_answers,
+            SUM(total_questions)
+                AS total_questions,
+            SUM(correct_answers)
+                AS correct_answers,
             ROUND(
                 SUM(correct_answers) * 100.0 /
                 NULLIF(SUM(total_questions), 0),
@@ -621,9 +623,7 @@ def companies():
     if not session.get("user_id"):
         return redirect("/login")
 
-    return render_template(
-        "company.html"
-    )
+    return render_template("company.html")
 
 
 @main.route("/company/<company_name>")
@@ -645,6 +645,234 @@ def company_preparation(company_name):
         "company_detail.html",
         company_name=company_data["name"],
         preparation_areas=company_data["areas"]
+    )
+
+
+# ==================================================
+# MOCK TESTS HOME
+# ==================================================
+
+@main.route("/mock-tests")
+def mock_tests():
+
+    if not session.get("user_id"):
+        return redirect("/login")
+
+    return render_template(
+        "mock_tests.html"
+    )
+
+
+# ==================================================
+# START MOCK TEST
+# ==================================================
+
+@main.route("/mock-test/<test_type>")
+def start_mock_test(test_type):
+
+    if not session.get("user_id"):
+        return redirect("/login")
+
+    conn = get_db_connection()
+
+    if test_type == "aptitude":
+
+        questions = conn.execute("""
+            SELECT *
+            FROM questions
+            WHERE category = 'Aptitude'
+            ORDER BY RANDOM()
+            LIMIT 10
+        """).fetchall()
+
+        title = "Aptitude Mock Test"
+
+    elif test_type == "reasoning":
+
+        questions = conn.execute("""
+            SELECT *
+            FROM questions
+            WHERE category = 'Reasoning'
+            ORDER BY RANDOM()
+            LIMIT 10
+        """).fetchall()
+
+        title = "Reasoning Mock Test"
+
+    elif test_type == "technical":
+
+        questions = conn.execute("""
+            SELECT *
+            FROM questions
+            WHERE category IN (
+                'Programming',
+                'Data Structures',
+                'Database',
+                'Core CS'
+            )
+            ORDER BY RANDOM()
+            LIMIT 10
+        """).fetchall()
+
+        title = "Technical Mock Test"
+
+    elif test_type == "full":
+
+        questions = conn.execute("""
+            SELECT *
+            FROM questions
+            ORDER BY RANDOM()
+            LIMIT 20
+        """).fetchall()
+
+        title = "Full Placement Mock Test"
+
+    else:
+
+        conn.close()
+        return redirect("/mock-tests")
+
+    conn.close()
+
+    if not questions:
+
+        return (
+            "<h2>No questions available.</h2>"
+            '<br><a href="/mock-tests">'
+            "Back to Mock Tests"
+            "</a>"
+        )
+
+    return render_template(
+        "mock_test.html",
+        questions=questions,
+        title=title,
+        test_type=test_type
+    )
+
+
+# ==================================================
+# SUBMIT MOCK TEST
+# ==================================================
+
+@main.route(
+    "/submit-mock-test",
+    methods=["POST"]
+)
+def submit_mock_test():
+
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect("/login")
+
+    test_type = request.form.get(
+        "test_type",
+        "full"
+    )
+
+    question_ids = request.form.getlist(
+        "question_ids"
+    )
+
+    if not question_ids:
+
+        return redirect("/mock-tests")
+
+    conn = get_db_connection()
+
+    questions = []
+
+    for question_id in question_ids:
+
+        question = conn.execute("""
+            SELECT *
+            FROM questions
+            WHERE id = ?
+        """, (
+            question_id,
+        )).fetchone()
+
+        if question:
+            questions.append(question)
+
+    score = 0
+
+    for question in questions:
+
+        user_answer = request.form.get(
+            f"question_{question['id']}"
+        )
+
+        if user_answer == question[
+            "correct_answer"
+        ]:
+
+            score += 1
+
+    total = len(questions)
+
+    wrong = total - score
+
+    if total > 0:
+
+        percentage = round(
+            (score / total) * 100,
+            2
+        )
+
+    else:
+
+        percentage = 0
+
+    titles = {
+        "aptitude": "Aptitude Mock Test",
+        "reasoning": "Reasoning Mock Test",
+        "technical": "Technical Mock Test",
+        "full": "Full Placement Mock Test"
+    }
+
+    title = titles.get(
+        test_type,
+        "Mock Test"
+    )
+
+    conn.execute("""
+        INSERT INTO attempts
+        (
+            user_id,
+            category,
+            subject,
+            topic,
+            total_questions,
+            correct_answers,
+            wrong_answers,
+            score,
+            percentage
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        user_id,
+        "Mock Test",
+        title,
+        test_type.title(),
+        total,
+        score,
+        wrong,
+        score,
+        percentage
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return render_template(
+        "result.html",
+        score=score,
+        total=total,
+        wrong=wrong,
+        percentage=percentage,
+        questions=questions
     )
 
 
@@ -948,7 +1176,6 @@ def import_questions():
             if existing:
 
                 skipped += 1
-
                 continue
 
             conn.execute("""
@@ -984,7 +1211,6 @@ def import_questions():
             added += 1
 
         conn.commit()
-
         conn.close()
 
         return (
@@ -1329,32 +1555,27 @@ def performance():
     summary = conn.execute("""
         SELECT
 
-            COUNT(*)
-                AS total_attempts,
+            COUNT(*) AS total_attempts,
 
             COALESCE(
                 SUM(total_questions),
                 0
-            )
-                AS total_questions,
+            ) AS total_questions,
 
             COALESCE(
                 SUM(correct_answers),
                 0
-            )
-                AS total_correct,
+            ) AS total_correct,
 
             COALESCE(
                 SUM(wrong_answers),
                 0
-            )
-                AS total_wrong,
+            ) AS total_wrong,
 
             COALESCE(
                 AVG(percentage),
                 0
-            )
-                AS average_percentage
+            ) AS average_percentage
 
         FROM attempts
 
@@ -1532,29 +1753,13 @@ def performance():
 
     return render_template(
         "performance.html",
-
         attempts=attempts,
-
         summary=summary,
-
-        topic_performance=
-            topic_performance,
-
-        weak_topics=
-            weak_topics,
-
-        improvement_topics=
-            improvement_topics,
-
-        strong_topics=
-            strong_topics,
-
-        recommendations=
-            recommendations,
-
-        readiness_score=
-            readiness_score,
-
-        readiness_message=
-            readiness_message
+        topic_performance=topic_performance,
+        weak_topics=weak_topics,
+        improvement_topics=improvement_topics,
+        strong_topics=strong_topics,
+        recommendations=recommendations,
+        readiness_score=readiness_score,
+        readiness_message=readiness_message
     )
